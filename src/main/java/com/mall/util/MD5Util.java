@@ -1,11 +1,10 @@
-package com.mmall.util;
-
-import org.springframework.util.StringUtils;
+package com.mall.util;
 
 import java.security.MessageDigest;
 
 /**
- * Created by geely
+ * @Auther yusiming
+ * @Date 2018/11/22 21:37
  */
 public class MD5Util {
 

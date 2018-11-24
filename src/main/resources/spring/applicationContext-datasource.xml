@@ -66,7 +66,7 @@
         <property name="basePackage" value="com.mall.dao"/>
     </bean>
     <!--是声明式事务的注解生效-->
-    <tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true"/>
+    <tx:annotation-driven transaction-manager="transactionManager"/>
 
     <!--配置事务管理器-->
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
