@@ -132,7 +132,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     /**
-     * 检查找回密码问题的答案
+     * 校验找回密码问题的答案
      *
      * @param username 用户名称
      * @param question 找回密码问题
@@ -248,5 +248,18 @@ public class UserServiceImpl implements IUserService {
         }
         user.setPassword(StringUtils.EMPTY);
         return ServerResponse.createBySuccess(user);
+    }
+
+    /**
+     * 校验用户是否为管理员
+     *
+     * @param user 需要校验的用户
+     * @return
+     */
+    public ServerResponse<String> checkAdminRole(User user) {
+        if (user != null && user.getRole() == Const.Role.ROLE_ADMIN) {
+            return ServerResponse.createBySuccess();
+        }
+        return ServerResponse.createByError();
     }
 }
