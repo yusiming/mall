@@ -26,8 +26,8 @@
             </bean>
         </mvc:message-converters>
     </mvc:annotation-driven>
-
-    <bean class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+    <!--CommonsMultipartResolver这个bean必须配置id为multipartResolver，否则上传文件会发生错误-->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
         <property name="maxUploadSize" value="10485760"/><!--10m-->
         <property name="maxInMemorySize" value="4096"/>
         <property name="defaultEncoding" value="UTF-8"/>
