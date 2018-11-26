@@ -96,7 +96,7 @@ public class CategoryServiceImpl implements ICategoryService {
      * @param categoryId 分类id
      * @return
      */
-    public ServerResponse selectCategoryAndChildrenById(Integer categoryId) {
+    public ServerResponse<List<Integer>> selectCategoryAndChildrenById(Integer categoryId) {
         if (categoryId == null) {
             return ServerResponse.createByErrorMessage("参数错误，分类id不能为空");
         }

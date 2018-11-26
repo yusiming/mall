@@ -1,5 +1,9 @@
 package com.mall.common;
 
+import com.google.common.collect.Sets;
+
+import java.util.Set;
+
 /**
  * 常量类
  *
@@ -16,5 +20,27 @@ public class Const {
         int ROLE_CUSTOMER = 0;
         // 管理员
         int ROLE_ADMIN = 1;
+    }
+
+    public enum ProductStatus {
+        ON_SALE("在售",1),;
+        private String value;
+        private int code;
+
+        ProductStatus(String value, int code) {
+            this.value = value;
+            this.code = code;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public int getCode() {
+            return code;
+        }
+    }
+    public interface ProductListOrderBy{
+        Set<String> PRICE_ASC_DESC = Sets.newHashSet("price_asc","price_desc");
     }
 }
