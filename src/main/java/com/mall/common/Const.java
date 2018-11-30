@@ -23,7 +23,7 @@ public class Const {
     }
 
     public enum ProductStatus {
-        ON_SALE("在售",1),;
+        ON_SALE("在售", 1),;
         private String value;
         private int code;
 
@@ -40,7 +40,17 @@ public class Const {
             return code;
         }
     }
-    public interface ProductListOrderBy{
-        Set<String> PRICE_ASC_DESC = Sets.newHashSet("price_asc","price_desc");
+
+    public interface ProductListOrderBy {
+        Set<String> PRICE_ASC_DESC = Sets.newHashSet("price_asc", "price_desc");
     }
+
+    public interface Cart {
+        int UN_CHECKED = 0; // 购物车中未选中状态
+        int CHECKED = 1; // 购物车中已选中状态
+
+        String LIMIT_NUM_FAIL = "LIMIT_NUM_FAIL";
+        String LIMIT_NUM_SUCCESS = "LIMIT_NUM_SUCCESS";
+    }
+
 }
