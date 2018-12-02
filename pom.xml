@@ -223,6 +223,7 @@
       <artifactId>commons-logging</artifactId>
       <version>1.1.1</version>
     </dependency>
+    <!--生成二维码-->
     <dependency>
       <groupId>com.google.zxing</groupId>
       <artifactId>core</artifactId>
@@ -266,8 +267,8 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
-          <source>10</source>
-          <target>10</target>
+          <source>1.8</source>
+          <target>1.8</target>
           <encoding>UTF-8</encoding>
           <!--将本地jar包引入lib目录下-->
           <compilerArguments>
