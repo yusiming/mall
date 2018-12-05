@@ -42,6 +42,18 @@
         from mall_order
         where order_no = #{orderNo}
     </select>
+    <select id="selectByUserId" resultMap="BaseResultMap" parameterType="int">
+        select
+        <include refid="Base_Column_List"/>
+        from mall_order
+        where user_id = #{userId} order by create_time desc
+    </select>
+    <select id="selectAllOrder" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from mall_order
+        order by create_time
+    </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
         delete from mall_order
         where id = #{id,jdbcType=INTEGER}

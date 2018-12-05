@@ -84,6 +84,15 @@ public class Const {
         public int getCode() {
             return code;
         }
+
+        public static String getDesc(int code) {
+            for (OrderStatus orderStatus : values()) {
+                if (orderStatus.code == code) {
+                    return orderStatus.value;
+                }
+            }
+            throw new RuntimeException("没有对应的支付类型");
+        }
     }
 
     public interface AlipayCallback {
@@ -95,7 +104,7 @@ public class Const {
     }
 
     public enum PayPlatform {
-        ALIPAY(1,"支付宝");
+        ALIPAY(1, "支付宝");
         private String value;
         private int code;
 
@@ -121,5 +130,41 @@ public class Const {
         }
     }
 
+    public enum PaymentType {
+        ONLINE_PAY(1, "在线支付");
+
+        private String value;
+        private int code;
+
+        PaymentType(int code, String value) {
+            this.value = value;
+            this.code = code;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
+
+        public int getCode() {
+            return code;
+        }
+
+        public void setCode(int code) {
+            this.code = code;
+        }
+
+        public static String getDesc(int code) {
+            for (PaymentType paymentType : values()) {
+                if (paymentType.code == code) {
+                    return paymentType.value;
+                }
+            }
+            throw new RuntimeException("没有对应的支付类型");
+        }
+    }
 
 }
