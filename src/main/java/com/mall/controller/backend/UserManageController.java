@@ -22,12 +22,20 @@ public class UserManageController {
     @Autowired
     private IUserService iUserService;
 
+    /**
+     * 后台管理员登陆
+     *
+     * @param username 用户名称
+     * @param password 密码
+     * @param session  session域
+     * @return 响应
+     */
     @RequestMapping(value = "login.do", method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse login(String username, String password, HttpSession session) {
-        ServerResponse<User> response = iUserService.login(username, password);
+        ServerResponse response = iUserService.login(username, password);
         if (response.isSuccess()) {
-            User user = response.getData();
+            User user = (User) response.getData();
             if (user.getRole() == Const.Role.ROLE_ADMIN) {
                 session.setAttribute(Const.CURRENT_USER, user);
                 return response;

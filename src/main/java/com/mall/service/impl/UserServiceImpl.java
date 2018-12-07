@@ -11,6 +11,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.UUID;
 
 /**
@@ -115,12 +116,17 @@ public class UserServiceImpl implements IUserService {
     }
 
     /**
-     * 根据用户名查找找回密码问题
+     * 根据用户名查找密码提示问题
      *
      * @param username 用户名
      * @return 如果该用户不存在、问题为空，返回错误响应，否则返回正确的响应
      */
-    public ServerResponse<String> selectQuestion(String username) {
+    public ServerResponse selectQuestion(String username) {
+        /*
+         * 1.校验用户名称
+         * 2.根据用户名称查找问题
+         * 3.返回给前端
+         */
         ServerResponse validResponse = checkValid(Const.USERNAME, username);
         if (validResponse.isSuccess()) {
             return ServerResponse.createByErrorMessage("用户不存在");
@@ -140,9 +146,15 @@ public class UserServiceImpl implements IUserService {
      * @param username 用户名称
      * @param question 找回密码问题
      * @param answer   用户填写的答案
-     * @return
+     * @return 响应
      */
-    public ServerResponse<String> checkAnswer(String username, String question, String answer) {
+    public ServerResponse checkAnswer(String username, String question, String answer) {
+        /*
+         * 校验答案：
+         * 1.如果答案错误返回错误响应
+         * 2.如果答案正确，给前端返回一个"token"令牌，该令牌在服务器端会保留12个小时
+         *   用户在修改密码时需要传递过来这个"token"令牌
+         */
         int resultCount = userMapper.checkAnswer(username, question, answer);
         if (resultCount > 0) {
             String forgetToken = UUID.randomUUID().toString();
@@ -158,14 +170,20 @@ public class UserServiceImpl implements IUserService {
      * @param username    用户名
      * @param passwordNew 新密码
      * @param forgetToken token
-     * @return
+     * @return 响应
      */
-    public ServerResponse<String> forgetResetPassword(String username, String passwordNew, String forgetToken) {
+    public ServerResponse forgetResetPassword(String username, String passwordNew, String forgetToken) {
+        /*
+         * 1.校验token值是否为空
+         * 2.校验用户名称是否存在
+         * 3.校验服务器端token值是否存在
+         * 4.校验两个token值是否一致
+         * 5.修改密码
+         */
         if (StringUtils.isBlank(forgetToken)) {
             return ServerResponse.createByErrorMessage("参数错误，token为空");
         }
-        // 校验用户名
-        ServerResponse validResponse = this.checkValid(Const.USERNAME,username);
+        ServerResponse validResponse = this.checkValid(Const.USERNAME, username);
         if (validResponse.isSuccess()) {
             return ServerResponse.createByErrorMessage("用户不存在");
         }
@@ -182,7 +200,7 @@ public class UserServiceImpl implements IUserService {
                 return ServerResponse.createBySuccessMsg("修改密码成功");
             }
         } else {
-            ServerResponse.createByErrorMessage("token错误，请重新获取重置密码的token");
+            return ServerResponse.createByErrorMessage("token错误，请重新获取重置密码的token");
         }
         return ServerResponse.createByErrorMessage("修改密码失败");
     }
@@ -190,19 +208,22 @@ public class UserServiceImpl implements IUserService {
     /**
      * 更新用户密码
      *
-     * @param user
-     * @param passwordOld
-     * @param passwordNew
-     * @return
+     * @param userId      用户id
+     * @param passwordOld 旧密码
+     * @param passwordNew 新密码
+     * @return 响应
      */
-    public ServerResponse<String> resetPassword(User user, String passwordOld, String passwordNew) {
+    public ServerResponse resetPassword(Integer userId, String passwordOld, String passwordNew) {
         // 防止横向越权，需要校验一下这个用户的密码
-        int resultCount = userMapper.checkPassword(MD5Util.MD5EncodeUtf8(passwordOld), user.getId());
+        int resultCount = userMapper.checkPassword(MD5Util.MD5EncodeUtf8(passwordOld), userId);
         if (resultCount == 0) {
             return ServerResponse.createByErrorMessage("旧密码错误");
         }
-        user.setPassword(MD5Util.MD5EncodeUtf8(passwordNew));
-        int updateCount = userMapper.updateByPrimaryKeySelective(user);
+        User updateUser = new User();
+        updateUser.setId(userId);
+        updateUser.setPassword(MD5Util.MD5EncodeUtf8(passwordNew));
+        updateUser.setUpdateTime(new Date());
+        int updateCount = userMapper.updateByPrimaryKeySelective(updateUser);
         if (updateCount > 0) {
             return ServerResponse.createBySuccessMsg("密码更新成功");
         }
@@ -212,10 +233,10 @@ public class UserServiceImpl implements IUserService {
     /**
      * 更新用户信息
      *
-     * @param user
-     * @return
+     * @param user user对象
+     * @return 响应
      */
-    public ServerResponse<User> updateUserInfo(User user) {
+    public ServerResponse updateUserInfo(User user) {
         // username不能被更新
         // 需要校验email是否已经被别的用户使用了
         int resultCount = userMapper.checkEmailByUserId(user.getEmail(), user.getId());
@@ -229,6 +250,7 @@ public class UserServiceImpl implements IUserService {
         updateUser.setPhone(user.getPhone());
         updateUser.setQuestion(user.getQuestion());
         updateUser.setAnswer(user.getAnswer());
+        updateUser.setUpdateTime(new Date());
         int updateCount = userMapper.updateByPrimaryKeySelective(updateUser);
         if (updateCount > 0) {
             updateUser.setUsername(user.getUsername());
@@ -242,13 +264,14 @@ public class UserServiceImpl implements IUserService {
      * 根据用户id获取用户详细信息
      *
      * @param userId 用户id
-     * @return
+     * @return 响应对象
      */
-    public ServerResponse<User> getInformation(Integer userId) {
+    public ServerResponse getInformation(Integer userId) {
         User user = userMapper.selectByPrimaryKey(userId);
         if (user == null) {
             return ServerResponse.createByErrorMessage("找不到当前用户");
         }
+        // 抹去密码
         user.setPassword(StringUtils.EMPTY);
         return ServerResponse.createBySuccess(user);
     }
@@ -257,9 +280,9 @@ public class UserServiceImpl implements IUserService {
      * 校验用户是否为管理员
      *
      * @param user 需要校验的用户
-     * @return
+     * @return 响应对象
      */
-    public ServerResponse<String> checkAdminRole(User user) {
+    public ServerResponse checkAdminRole(User user) {
         if (user != null && user.getRole() == Const.Role.ROLE_ADMIN) {
             return ServerResponse.createBySuccess();
         }

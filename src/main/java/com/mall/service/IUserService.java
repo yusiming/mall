@@ -34,17 +34,66 @@ public interface IUserService {
      */
     ServerResponse checkValid(String type, String str);
 
-    ServerResponse<String> selectQuestion(String username);
+    /**
+     * 通过用户名称获取密码提示问题
+     *
+     * @param username 用户名
+     * @return 如果该用户不存在、问题为空，返回错误响应，否则返回正确的响应
+     */
+    ServerResponse selectQuestion(String username);
 
-    ServerResponse<String> checkAnswer(String username, String question, String answer);
+    /**
+     * 检验密码提示问题的答案是否正确
+     *
+     * @param username 用户名称
+     * @param question 问题
+     * @param answer   答案
+     * @return 响应
+     */
+    ServerResponse checkAnswer(String username, String question, String answer);
 
-    ServerResponse<String> forgetResetPassword(String username, String passwordNew, String forgetToken);
+    /**
+     * 未登陆状态下，修改用户密码
+     * 前端需要传入token值，来保证安全性
+     *
+     * @param username    用户名称
+     * @param passwordNew 新密码
+     * @param forgetToken token值
+     * @return 响应
+     */
+    ServerResponse forgetResetPassword(String username, String passwordNew, String forgetToken);
 
-    ServerResponse<String> resetPassword(User user, String passwordOld, String passwordNew);
+    /**
+     * 登陆状态下重置密码
+     *
+     * @param userId      用户id
+     * @param passwordOld 旧密码
+     * @param passwordNew 新密码
+     * @return 响应
+     */
+    ServerResponse resetPassword(Integer userId, String passwordOld, String passwordNew);
 
-    ServerResponse<User> updateUserInfo(User user);
+    /**
+     * 登陆状态下更新用户信息
+     *
+     * @param user user对象
+     * @return 响应
+     */
+    ServerResponse updateUserInfo(User user);
 
-    ServerResponse<User> getInformation(Integer userId);
+    /**
+     * 根据userId获取用户详细信息
+     *
+     * @param userId 用户id
+     * @return 响应
+     */
+    ServerResponse getInformation(Integer userId);
 
-    ServerResponse<String> checkAdminRole(User user);
+    /**
+     * 检查是否为管理员
+     *
+     * @param user user对象
+     * @return 响应
+     */
+    ServerResponse checkAdminRole(User user);
 }

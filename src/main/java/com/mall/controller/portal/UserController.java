@@ -90,7 +90,7 @@ public class UserController {
      */
     @RequestMapping(value = "get_user_info.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<User> getUserInfo(HttpSession session) {
+    public ServerResponse getUserInfo(HttpSession session) {
         User user = (User) session.getAttribute(Const.CURRENT_USER);
         if (user != null) {
             return ServerResponse.createBySuccess(user);
@@ -106,12 +106,12 @@ public class UserController {
      */
     @RequestMapping(value = "forget_get_question.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<String> forgetGetQuestion(String username) {
+    public ServerResponse forgetGetQuestion(String username) {
         return iUserService.selectQuestion(username);
     }
 
     /**
-     * 检测问题的答案是否正确
+     * 检测密码提示问题的答案是否正确
      *
      * @param username 用户名
      * @param question 问题
@@ -120,12 +120,12 @@ public class UserController {
      */
     @RequestMapping(value = "forget_check_answer.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<String> forgetCheckAnswer(String username, String question, String answer) {
+    public ServerResponse forgetCheckAnswer(String username, String question, String answer) {
         return iUserService.checkAnswer(username, question, answer);
     }
 
     /**
-     * 重置用户密码
+     * 未登陆状态下，通过密码提示问题重置用户密码
      *
      * @param username    用户名称
      * @param passwordNew 新密码
@@ -134,7 +134,7 @@ public class UserController {
      */
     @RequestMapping(value = "forget_reset_password.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<String> forgetResetPassword(String username, String passwordNew, String forgetToken) {
+    public ServerResponse forgetResetPassword(String username, String passwordNew, String forgetToken) {
         return iUserService.forgetResetPassword(username, passwordNew, forgetToken);
     }
 
@@ -144,36 +144,36 @@ public class UserController {
      * @param session     session
      * @param passwordOld 旧密码
      * @param passwordNew 新密码
-     * @return
+     * @return 响应
      */
     @RequestMapping(value = "reset_password.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<String> resetPassword(HttpSession session, String passwordOld, String passwordNew) {
+    public ServerResponse resetPassword(HttpSession session, String passwordOld, String passwordNew) {
         User user = (User) session.getAttribute(Const.CURRENT_USER);
         if (user == null) {
             return ServerResponse.createByErrorMessage("用户未登录");
         }
-        return iUserService.resetPassword(user, passwordOld, passwordNew);
+        return iUserService.resetPassword(user.getId(), passwordOld, passwordNew);
     }
 
     /**
      * 登陆状态下更新用户信息
      *
-     * @param session
-     * @param user
-     * @return
+     * @param session session域
+     * @param user    User对象
+     * @return 响应
      */
     @RequestMapping(value = "update_user_info.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<User> updateUserInfo(HttpSession session, User user) {
+    public ServerResponse updateUserInfo(HttpSession session, User user) {
         User currentUser = (User) session.getAttribute(Const.CURRENT_USER);
         if (currentUser == null) {
             return ServerResponse.createByErrorMessage("用户未登录");
         }
-        // 防止用户越权
+        // 防止用户越权，将user对象的id设置为session域中user的id，这样就保证了user只能改自己的信息
         user.setId(currentUser.getId());
         user.setUsername(currentUser.getUsername());
-        ServerResponse<User> response = iUserService.updateUserInfo(user);
+        ServerResponse response = iUserService.updateUserInfo(user);
         if (response.isSuccess()) {
             // 在session域中放入更新过的用户信息
             session.setAttribute(Const.CURRENT_USER, response.getData());
@@ -184,12 +184,12 @@ public class UserController {
     /**
      * 获取当前登陆用户详细信息
      *
-     * @param session
-     * @return
+     * @param session session域
+     * @return 响应
      */
     @RequestMapping(value = "get_information.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<User> getInformation(HttpSession session) {
+    public ServerResponse getInformation(HttpSession session) {
         User currentUser = (User) session.getAttribute(Const.CURRENT_USER);
         if (currentUser == null) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登陆");
