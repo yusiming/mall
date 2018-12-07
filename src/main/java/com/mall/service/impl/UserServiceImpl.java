@@ -52,32 +52,32 @@ public class UserServiceImpl implements IUserService {
         return ServerResponse.createBySuccessMsg("登陆成功!", user);
     }
 
-
-
     /**
      * 用户注册
      *
-     * @param user 用户信息
-     * @return
+     * @param user 代表用户注册信息的User对象
+     * @return 响应
      */
-    public ServerResponse<String> register(User user) {
-        // 检查用户名称是否已经存在
-        ServerResponse<String> response = checkValid(user.getUsername(), Const.USERNAME);
+    public ServerResponse register(User user) {
+        /*
+         * 用户注册逻辑：
+         * 1.校验用户名称
+         * 2.校验email
+         * 3.设置用户角色
+         * 4.处理密码
+         * 5.插入记录到数据库中
+         */
+        ServerResponse response = checkValid(Const.USERNAME, user.getUsername());
         if (!response.isSuccess()) {
             return response;
         }
-
-        // 检查email是否已经存在
-        response = checkValid(user.getEmail(), Const.EMAIL);
+        response = checkValid(Const.EMAIL, user.getEmail());
         if (!response.isSuccess()) {
             return response;
         }
-
-        // 设置用户的角色
+        // 设置用户角色为普通用户
         user.setRole(Const.Role.ROLE_CUSTOMER);
-        // MD5加密处理
         user.setPassword(MD5Util.MD5EncodeUtf8(user.getPassword()));
-        // 插入用户记录
         int resultCount = userMapper.insert(user);
         if (resultCount == 0) {
             return ServerResponse.createByErrorMessage("注册失败");
@@ -93,26 +93,25 @@ public class UserServiceImpl implements IUserService {
      * @return 如果对应的值不存在，返回成功的响应，否则返回失败的响应
      */
     @Override
-    public ServerResponse<String> checkValid(String type, String str) {
-        // 如果type不为空，开始校验
+    public ServerResponse checkValid(String type, String str) {
         if (StringUtils.isNotBlank(type)) {
             if (Const.USERNAME.equals(type)) {
                 int resultCount = userMapper.checkUsername(str);
                 if (resultCount > 0) {
-                    return ServerResponse.createByErrorMessage("用户名已存在");
+                    return ServerResponse.createByErrorMessage("用户名已存在!");
                 }
             } else if (Const.EMAIL.equals(type)) {
                 int resultCount = userMapper.checkEmail(str);
                 if (resultCount > 0) {
-                    return ServerResponse.createByErrorMessage("email已被注册");
+                    return ServerResponse.createByErrorMessage("email已被注册!");
                 }
             } else {
-                return ServerResponse.createByErrorMessage("参数错误");
+                return ServerResponse.createByErrorMessage("参数错误!");
             }
         } else {
-            return ServerResponse.createByErrorMessage("参数错误");
+            return ServerResponse.createByErrorMessage("参数错误!");
         }
-        return ServerResponse.createBySuccessMsg("校验成功");
+        return ServerResponse.createBySuccessMsg("校验成功!");
     }
 
     /**
@@ -122,7 +121,7 @@ public class UserServiceImpl implements IUserService {
      * @return 如果该用户不存在、问题为空，返回错误响应，否则返回正确的响应
      */
     public ServerResponse<String> selectQuestion(String username) {
-        ServerResponse<String> validResponse = checkValid(Const.USERNAME, username);
+        ServerResponse validResponse = checkValid(Const.USERNAME, username);
         if (validResponse.isSuccess()) {
             return ServerResponse.createByErrorMessage("用户不存在");
         }
@@ -166,7 +165,7 @@ public class UserServiceImpl implements IUserService {
             return ServerResponse.createByErrorMessage("参数错误，token为空");
         }
         // 校验用户名
-        ServerResponse<String> validResponse = this.checkValid(username, Const.USERNAME);
+        ServerResponse validResponse = this.checkValid(Const.USERNAME,username);
         if (validResponse.isSuccess()) {
             return ServerResponse.createByErrorMessage("用户不存在");
         }

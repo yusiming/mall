@@ -17,9 +17,22 @@ public interface IUserService {
      */
     ServerResponse login(String username, String password);
 
-    ServerResponse<String> register(User user);
+    /**
+     * 用户注册
+     *
+     * @param user 代表用户注册信息的User对象
+     * @return 如果注册成功返回成功的响应，否则返回失败的响应
+     */
+    ServerResponse register(User user);
 
-    ServerResponse<String> checkValid(String type, String str);
+    /**
+     * 校验用户名和email是否存在
+     *
+     * @param type 校验的类型，username或者为email
+     * @param str  需要校验的值
+     * @return 如果存在，返回错误的响应，否则返回成功的响应
+     */
+    ServerResponse checkValid(String type, String str);
 
     ServerResponse<String> selectQuestion(String username);
 

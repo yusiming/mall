@@ -65,7 +65,7 @@ public class UserController {
      */
     @RequestMapping(value = "register.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<String> register(User user) {
+    public ServerResponse register(User user) {
         return iUserService.register(user);
     }
 
@@ -78,7 +78,7 @@ public class UserController {
      */
     @RequestMapping(value = "check_valid.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<String> checkValid(String type, String str) {
+    public ServerResponse checkValid(String type, String str) {
         return iUserService.checkValid(type, str);
     }
 
@@ -86,7 +86,7 @@ public class UserController {
      * 从session中获取登陆用户信息
      *
      * @param session session域对象
-     * @return 响应
+     * @return 若用户未登陆，返回错误的响应对象，否则返回正确的响应对象，将user的信息传递给前端
      */
     @RequestMapping(value = "get_user_info.do", method = RequestMethod.POST)
     @ResponseBody
