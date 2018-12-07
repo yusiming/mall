@@ -26,34 +26,34 @@ public class UserController {
     private IUserService iUserService;
 
     /**
-     * 用户登陆，限制为POST请求
+     * 用户登陆，限制为post请求
      *
+     * @param session  session域
      * @param username 用户名称
-     * @param password 密码
-     * @param session  HttpSession
-     * @return 响应对象
+     * @param password 用户密码
+     * @return 如果登陆成功，返回一个成功的响应，如果登陆失败返回一个错误的响应
      */
     @RequestMapping(value = "login.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<User> login(String username, String password, HttpSession session) {
-        ServerResponse<User> response = iUserService.login(username, password);
-        // 如果为成功的响应，则将用户数据放入session中
+    public ServerResponse login(HttpSession session, String username, String password) {
+        ServerResponse response = iUserService.login(username, password);
         if (response.isSuccess()) {
             session.setAttribute(Const.CURRENT_USER, response.getData());
         }
+        // 无论是否登陆成功，都返回response，如果成功，前台拿到信息可以显示到页面上，如果登陆失败，显示错误信息
         return response;
     }
 
     /**
-     * 用户登出
+     * 用户登出，将session域中user对象删除即可
      *
-     * @param httpSession session
+     * @param session session域
      * @return 响应
      */
-    @RequestMapping(value = "logout.do", method = RequestMethod.POST)
+    @RequestMapping(value = "logout.do", method = RequestMethod.GET)
     @ResponseBody
-    public ServerResponse<String> logout(HttpSession httpSession) {
-        httpSession.removeAttribute(Const.CURRENT_USER);
+    public ServerResponse logout(HttpSession session) {
+        session.removeAttribute(Const.CURRENT_USER);
         return ServerResponse.createBySuccess();
     }
 

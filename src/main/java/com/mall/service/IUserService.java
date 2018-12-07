@@ -8,7 +8,14 @@ import com.mall.pojo.User;
  * @Date 2018/11/22 21:34
  */
 public interface IUserService {
-    ServerResponse<User> login(String username, String password);
+    /**
+     * 校验用户登陆信息
+     *
+     * @param username 用户名
+     * @param password 密码
+     * @return 如果校验通过，返回一个成功的响应，否则返回错误的响应
+     */
+    ServerResponse login(String username, String password);
 
     ServerResponse<String> register(User user);
 

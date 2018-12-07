@@ -23,32 +23,36 @@ public class UserServiceImpl implements IUserService {
     private UserMapper userMapper;
 
     /**
-     * 用户登陆
+     * 校验用户登陆信息
      *
-     * @param username 用户名称
-     * @param password 用户密码
-     * @return 响应对象
+     * @param username 用户名
+     * @param password 密码
+     * @return 如果登陆成功返回正确响应，将user对象返回data域中返回给前端，否则返回错误响应
      */
     @Override
-    public ServerResponse<User> login(String username, String password) {
+    public ServerResponse login(String username, String password) {
+        /*
+         * 校验逻辑：
+         * 1.先校验用户名称，如果数据库中不存在该用户名，直接返回一个错误的响应对象
+         * 2.根据用户名和密码查询用户，如果查询结果为null，证明密码错误
+         * 如果查询结果不为null，则返回ServerResponse<User>对象，
+         */
         int resultCount = userMapper.checkUsername(username);
-        // 如果该用户名称不存在返回错误信息
         if (resultCount == 0) {
-            return ServerResponse.createByErrorMessage("用户名不存在");
+            return ServerResponse.createByErrorMessage("用户名不存在!");
         }
-        // 数据库中存储的是经过MD5加密过后的密码，所以校验密码是否正确应该将先加密，然后校验
+        // 注意：数据库中存储的是经过MD5加密之后的密码
         password = MD5Util.MD5EncodeUtf8(password);
-        // 根据用户名称和密码查询用户
         User user = userMapper.selectLogin(username, password);
-        // 如果user为null，证明密码错误，
         if (user == null) {
-            return ServerResponse.createByErrorMessage("密码错误");
+            return ServerResponse.createByErrorMessage("密码错误!");
         }
-        // 到这一步证明密码正确，但是需要将查询出来的密码置为空字符串，
+        // 抹去密码
         user.setPassword(StringUtils.EMPTY);
-        // 将用户信息放入响应对象中，controller可以通过ServerResponse的data拿到用户信息，放入session中
-        return ServerResponse.createBySuccessMsg("登陆成功", user);
+        return ServerResponse.createBySuccessMsg("登陆成功!", user);
     }
+
+
 
     /**
      * 用户注册
