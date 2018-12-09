@@ -32,6 +32,9 @@ public class UserServiceImpl implements IUserService {
      */
     @Override
     public ServerResponse login(String username, String password) {
+        if (StringUtils.isEmpty(username)) {
+            return ServerResponse.createByErrorMessage("用户名不能为空!");
+        }
         /*
          * 校验逻辑：
          * 1.先校验用户名称，如果数据库中不存在该用户名，直接返回一个错误的响应对象
