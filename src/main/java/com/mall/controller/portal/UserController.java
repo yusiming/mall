@@ -91,12 +91,11 @@ public class UserController {
     @RequestMapping(value = "get_user_info.do", method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse getUserInfo(HttpSession session) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
-        if (user != null) {
-            return ServerResponse.createBySuccess(user);
+        ServerResponse<User> response = checkLogin(session);
+        if (response.isSuccess()) {
+            return ServerResponse.createBySuccess(response.getData());
         }
-        return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
-                ResponseCode.NEED_LOGIN.getDesc());
+        return response;
     }
 
     /**
@@ -150,12 +149,11 @@ public class UserController {
     @RequestMapping(value = "reset_password.do", method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse resetPassword(HttpSession session, String passwordOld, String passwordNew) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
-        if (user == null) {
-            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
-                    ResponseCode.NEED_LOGIN.getDesc());
+        ServerResponse<User> response = checkLogin(session);
+        if (response.isSuccess()) {
+            return iUserService.resetPassword(response.getData().getId(), passwordOld, passwordNew);
         }
-        return iUserService.resetPassword(user.getId(), passwordOld, passwordNew);
+        return response;
     }
 
     /**
@@ -168,18 +166,18 @@ public class UserController {
     @RequestMapping(value = "update_user_info.do", method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse updateUserInfo(HttpSession session, User user) {
-        User currentUser = (User) session.getAttribute(Const.CURRENT_USER);
-        if (currentUser == null) {
-            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
-                    ResponseCode.NEED_LOGIN.getDesc());
-        }
-        // 防止用户越权，将user对象的id设置为session域中user的id，这样就保证了user只能改自己的信息
-        user.setId(currentUser.getId());
-        user.setUsername(currentUser.getUsername());
-        ServerResponse response = iUserService.updateUserInfo(user);
+        ServerResponse<User> response = checkLogin(session);
         if (response.isSuccess()) {
-            // 在session域中放入更新过的用户信息
-            session.setAttribute(Const.CURRENT_USER, response.getData());
+            User currentUser = response.getData();
+            // 防止用户越权，将user对象的id设置为session域中user的id，这样就保证了user只能改自己的信息
+            user.setId(currentUser.getId());
+            user.setUsername(currentUser.getUsername());
+            ServerResponse updateResponse = iUserService.updateUserInfo(user);
+            if (updateResponse.isSuccess()) {
+                // 在session域中放入更新过的用户信息
+                session.setAttribute(Const.CURRENT_USER, response.getData());
+            }
+            return updateResponse;
         }
         return response;
     }
@@ -193,11 +191,25 @@ public class UserController {
     @RequestMapping(value = "get_information.do", method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse getInformation(HttpSession session) {
-        User currentUser = (User) session.getAttribute(Const.CURRENT_USER);
-        if (currentUser == null) {
+        ServerResponse<User> response = checkLogin(session);
+        if (response.isSuccess()) {
+            return iUserService.getInformation(response.getData().getId());
+        }
+        return response;
+    }
+
+    /**
+     * 校验用户是否已登陆
+     *
+     * @param session session域
+     * @return 如果用户已经登陆，返回成功的响应，否则返回错误的响应
+     */
+    private ServerResponse<User> checkLogin(HttpSession session) {
+        User user = (User) session.getAttribute(Const.CURRENT_USER);
+        if (user == null) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
                     ResponseCode.NEED_LOGIN.getDesc());
         }
-        return iUserService.getInformation(currentUser.getId());
+        return ServerResponse.createBySuccess(user);
     }
 }
