@@ -156,6 +156,11 @@
         set password = #{password}, update_time = now()
         where username = #{username}
     </update>
+    <update id="updatePasswordByUserId">
+        update mall_user
+        set password = #{password}, update_time = now()
+        where id = #{userId}
+    </update>
     <select id="checkUsername" resultType="java.lang.Integer" parameterType="string">
         select count(*)
         from mall_user

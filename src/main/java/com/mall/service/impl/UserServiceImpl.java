@@ -222,12 +222,8 @@ public class UserServiceImpl implements IUserService {
         if (resultCount == 0) {
             return ServerResponse.createByErrorMessage("旧密码错误");
         }
-        User updateUser = new User();
-        updateUser.setId(userId);
-        updateUser.setPassword(MD5Util.MD5EncodeUtf8(passwordNew));
-        updateUser.setUpdateTime(new Date());
-        int updateCount = userMapper.updateByPrimaryKeySelective(updateUser);
-        if (updateCount > 0) {
+        resultCount = userMapper.updatePasswordByUserId(userId,passwordNew);
+        if (resultCount > 0) {
             return ServerResponse.createBySuccessMsg("密码更新成功");
         }
         return ServerResponse.createByErrorMessage("密码更新失败");
