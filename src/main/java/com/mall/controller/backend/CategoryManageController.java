@@ -1,19 +1,21 @@
 package com.mall.controller.backend;
 
 import com.mall.common.Const;
+import com.mall.common.ResponseCode;
 import com.mall.common.ServerResponse;
 import com.mall.pojo.User;
 import com.mall.service.ICategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpSession;
 
 /**
- * 后台分类管理
+ * 后台分类管理接口
  *
  * @Auther yusiming
  * @Date 2018/11/25 10:14
@@ -28,11 +30,17 @@ public class CategoryManageController {
      * 校验用户是否为管理员
      *
      * @param session session域
-     * @return
+     * @return 如果用户未登陆或者不是管理员，返回错误的响应，否则返回成功的响应
      */
-    private boolean isAdmin(HttpSession session) {
+    private ServerResponse isAdmin(HttpSession session) {
         User user = (User) session.getAttribute(Const.CURRENT_USER);
-        return user != null && user.getRole() != Const.Role.ROLE_CUSTOMER;
+        if (user == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
+                    ResponseCode.NEED_LOGIN.getDesc());
+        } else if (user.getRole() != Const.Role.ROLE_ADMIN) {
+            return ServerResponse.createByErrorMessage("您不是管理员，请勿随意登陆，否则我们将封禁您的IP!");
+        }
+        return ServerResponse.createBySuccess();
     }
 
     /**
@@ -41,16 +49,17 @@ public class CategoryManageController {
      * @param session      session域
      * @param categoryName 商品分类名称
      * @param parentId     父分类id
-     * @return
+     * @return 响应
      */
-    @RequestMapping(value = "add_category.do")
+    @RequestMapping(value = "add_category.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<String> addCategory(HttpSession session, String categoryName,
-                                              @RequestParam(value = "parentId", defaultValue = "0") Integer parentId) {
-        if (isAdmin(session)) {
+    public ServerResponse addCategory(HttpSession session, String categoryName,
+                                      @RequestParam(value = "parentId", defaultValue = "0") Integer parentId) {
+        ServerResponse response = isAdmin(session);
+        if (response.isSuccess()) {
             return iCategoryService.addCategory(categoryName, parentId);
         }
-        return ServerResponse.createByErrorMessage("无权限，需要管理员权限");
+        return response;
     }
 
     /**
@@ -63,11 +72,12 @@ public class CategoryManageController {
      */
     @RequestMapping(value = "set_category_name.do")
     @ResponseBody
-    public ServerResponse<String> setCategoryName(HttpSession session, Integer categoryId, String categoryName) {
-        if (isAdmin(session)) {
+    public ServerResponse setCategoryName(HttpSession session, Integer categoryId, String categoryName) {
+        ServerResponse response = isAdmin(session);
+        if (response.isSuccess()) {
             return iCategoryService.updateCategoryName(categoryId, categoryName);
         }
-        return ServerResponse.createByErrorMessage("无权限，需要管理员权限");
+        return response;
 
     }
 
@@ -82,10 +92,11 @@ public class CategoryManageController {
     @ResponseBody
     public ServerResponse getChildrenParallelCategory(HttpSession session, @RequestParam(value = "categoryId",
             defaultValue = "0") Integer categoryId) {
-        if (isAdmin(session)) {
+        ServerResponse response = isAdmin(session);
+        if (response.isSuccess()) {
             return iCategoryService.getChildrenParallelCategory(categoryId);
         }
-        return ServerResponse.createByErrorMessage("无权限，需要管理员权限");
+        return response;
     }
 
     /**
@@ -99,11 +110,12 @@ public class CategoryManageController {
     @ResponseBody
     public ServerResponse getCategoryAndDeepChildrenCategory(HttpSession session, @RequestParam(value = "categoryId",
             defaultValue = "0") Integer categoryId) {
-        if (isAdmin(session)) {
+        ServerResponse response = isAdmin(session);
+        if (response.isSuccess()) {
             // 查询
             return iCategoryService.selectCategoryAndChildrenById(categoryId);
         }
-        return ServerResponse.createByErrorMessage("无权限，需要管理员权限");
+        return response;
     }
 }
 
