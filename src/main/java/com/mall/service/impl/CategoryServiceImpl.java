@@ -82,6 +82,9 @@ public class CategoryServiceImpl implements ICategoryService {
      */
     @Override
     public ServerResponse<List<Category>> getChildrenParallelCategory(Integer categoryId) {
+        if (categoryId == null) {
+            return ServerResponse.createByErrorMessage("参数错误，分类id不能为空");
+        }
         // 注意：这里即使没有查询到任何子分类，也不认为是逻辑错误，直接返回一个空的集合即可
         List<Category> list = categoryMapper.selectChildrenCategoryByParentId(categoryId);
         if (CollectionUtils.isEmpty(list)) {
@@ -91,13 +94,16 @@ public class CategoryServiceImpl implements ICategoryService {
     }
 
     /**
-     * @param categoryId
-     * @return
+     * 递归查询指定分类的所有子分类，包括子孙分类
+     *
+     * @param categoryId 要查询的分类的id
+     * @return 响应
      */
     public ServerResponse<List<Integer>> selectCategoryAndChildrenById(Integer categoryId) {
         if (categoryId == null) {
             return ServerResponse.createByErrorMessage("参数错误，分类id不能为空");
         }
+        // 这里使用一个set来存储所有的分类，确保不会出现相同的分类
         Set<Category> categorySet = Sets.newHashSet();
         this.findChildCategory(categorySet, categoryId);
         List<Integer> categoryIdList = Lists.newArrayList();

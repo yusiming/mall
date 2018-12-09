@@ -71,7 +71,7 @@ public class CategoryManageController {
      * @param categoryName 分类名称
      * @return 响应
      */
-    @RequestMapping(value = "set_category_name.do")
+    @RequestMapping(value = "set_category_name.do", method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse setCategoryName(HttpSession session, Integer categoryId, String categoryName) {
         ServerResponse response = checkAdmin(session);
@@ -89,7 +89,7 @@ public class CategoryManageController {
      * @param categoryId 商品分类id
      * @return 响应
      */
-    @RequestMapping(value = "get_category.do")
+    @RequestMapping(value = "get_category.do", method = RequestMethod.GET)
     @ResponseBody
     public ServerResponse getChildrenParallelCategory(HttpSession session, @RequestParam(value = "categoryId",
             defaultValue = "0") Integer categoryId) {
@@ -105,9 +105,9 @@ public class CategoryManageController {
      *
      * @param session    session 域
      * @param categoryId 要递归查询的分类的id
-     * @return
+     * @return 响应
      */
-    @RequestMapping(value = "get_deep_category.do")
+    @RequestMapping(value = "get_deep_category.do", method = RequestMethod.GET)
     @ResponseBody
     public ServerResponse getCategoryAndDeepChildrenCategory(HttpSession session, @RequestParam(value = "categoryId",
             defaultValue = "0") Integer categoryId) {

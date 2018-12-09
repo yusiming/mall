@@ -37,5 +37,11 @@ public interface ICategoryService {
      */
     ServerResponse<List<Category>> getChildrenParallelCategory(Integer categoryId);
 
+    /**
+     * 递归查询指定分类的所有子分类，包括子孙分类
+     *
+     * @param categoryId 要查询的分类的id
+     * @return 包含一个集合的响应对象
+     */
     ServerResponse<List<Integer>> selectCategoryAndChildrenById(Integer categoryId);
 }
