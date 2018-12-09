@@ -32,7 +32,7 @@ public class CategoryManageController {
      * @param session session域
      * @return 如果用户未登陆或者不是管理员，返回错误的响应，否则返回成功的响应
      */
-    private ServerResponse isAdmin(HttpSession session) {
+    private ServerResponse checkAdmin(HttpSession session) {
         User user = (User) session.getAttribute(Const.CURRENT_USER);
         if (user == null) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
@@ -56,7 +56,7 @@ public class CategoryManageController {
     @ResponseBody
     public ServerResponse addCategory(HttpSession session, String categoryName,
                                       @RequestParam(value = "parentId", defaultValue = "0") Integer parentId) {
-        ServerResponse response = isAdmin(session);
+        ServerResponse response = checkAdmin(session);
         if (response.isSuccess()) {
             return iCategoryService.addCategory(categoryName, parentId);
         }
@@ -74,7 +74,7 @@ public class CategoryManageController {
     @RequestMapping(value = "set_category_name.do")
     @ResponseBody
     public ServerResponse setCategoryName(HttpSession session, Integer categoryId, String categoryName) {
-        ServerResponse response = isAdmin(session);
+        ServerResponse response = checkAdmin(session);
         if (response.isSuccess()) {
             return iCategoryService.updateCategoryName(categoryId, categoryName);
         }
@@ -93,7 +93,7 @@ public class CategoryManageController {
     @ResponseBody
     public ServerResponse getChildrenParallelCategory(HttpSession session, @RequestParam(value = "categoryId",
             defaultValue = "0") Integer categoryId) {
-        ServerResponse response = isAdmin(session);
+        ServerResponse response = checkAdmin(session);
         if (response.isSuccess()) {
             return iCategoryService.getChildrenParallelCategory(categoryId);
         }
@@ -111,7 +111,7 @@ public class CategoryManageController {
     @ResponseBody
     public ServerResponse getCategoryAndDeepChildrenCategory(HttpSession session, @RequestParam(value = "categoryId",
             defaultValue = "0") Integer categoryId) {
-        ServerResponse response = isAdmin(session);
+        ServerResponse response = checkAdmin(session);
         if (response.isSuccess()) {
             // 查询
             return iCategoryService.selectCategoryAndChildrenById(categoryId);
