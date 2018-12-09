@@ -95,7 +95,8 @@ public class UserController {
         if (user != null) {
             return ServerResponse.createBySuccess(user);
         }
-        return ServerResponse.createByErrorMessage("用户未登录，无法获取用户信息");
+        return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
+                ResponseCode.NEED_LOGIN.getDesc());
     }
 
     /**
@@ -151,7 +152,8 @@ public class UserController {
     public ServerResponse resetPassword(HttpSession session, String passwordOld, String passwordNew) {
         User user = (User) session.getAttribute(Const.CURRENT_USER);
         if (user == null) {
-            return ServerResponse.createByErrorMessage("用户未登录");
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
+                    ResponseCode.NEED_LOGIN.getDesc());
         }
         return iUserService.resetPassword(user.getId(), passwordOld, passwordNew);
     }
@@ -168,7 +170,8 @@ public class UserController {
     public ServerResponse updateUserInfo(HttpSession session, User user) {
         User currentUser = (User) session.getAttribute(Const.CURRENT_USER);
         if (currentUser == null) {
-            return ServerResponse.createByErrorMessage("用户未登录");
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
+                    ResponseCode.NEED_LOGIN.getDesc());
         }
         // 防止用户越权，将user对象的id设置为session域中user的id，这样就保证了user只能改自己的信息
         user.setId(currentUser.getId());
@@ -192,7 +195,8 @@ public class UserController {
     public ServerResponse getInformation(HttpSession session) {
         User currentUser = (User) session.getAttribute(Const.CURRENT_USER);
         if (currentUser == null) {
-            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "用户未登陆");
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
+                    ResponseCode.NEED_LOGIN.getDesc());
         }
         return iUserService.getInformation(currentUser.getId());
     }
