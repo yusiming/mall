@@ -45,7 +45,7 @@ public class CategoryManageController {
 
     /**
      * 添加商品分类
-     * 注意：没有父分类的
+     * 注意：若没有传入parentId，则赋予一个默认值0，表示这是一个一级分类
      *
      * @param session      session域
      * @param categoryName 商品分类名称
@@ -69,7 +69,7 @@ public class CategoryManageController {
      * @param session      session域
      * @param categoryId   分类id
      * @param categoryName 分类名称
-     * @return
+     * @return 响应
      */
     @RequestMapping(value = "set_category_name.do")
     @ResponseBody

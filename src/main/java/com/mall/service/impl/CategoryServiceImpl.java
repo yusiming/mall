@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -34,7 +35,7 @@ public class CategoryServiceImpl implements ICategoryService {
      * @return 响应
      */
     @Override
-    public ServerResponse<String> addCategory(String categoryName, Integer parentId) {
+    public ServerResponse addCategory(String categoryName, Integer parentId) {
         if (StringUtils.isBlank(categoryName) || parentId == null) {
             return ServerResponse.createByErrorMessage("参数错误");
         }
@@ -51,20 +52,21 @@ public class CategoryServiceImpl implements ICategoryService {
     }
 
     /**
-     * 更新商品分类名称
+     * 根据商品分类id，更新分类名称
      *
-     * @param categoryId   商品分类id
-     * @param categoryName 新的名称
-     * @return
+     * @param categoryId   要更新的分类的id
+     * @param categoryName 要更新的分类的名称
+     * @return 响应
      */
     @Override
-    public ServerResponse<String> updateCategoryName(Integer categoryId, String categoryName) {
+    public ServerResponse updateCategoryName(Integer categoryId, String categoryName) {
         if (categoryId == null || StringUtils.isBlank(categoryName)) {
             return ServerResponse.createByErrorMessage("参数错误");
         }
         Category category = new Category();
         category.setId(categoryId);
         category.setName(categoryName);
+        category.setUpdateTime(new Date());
         int resultCount = categoryMapper.updateByPrimaryKeySelective(category);
         if (resultCount > 0) {
             return ServerResponse.createBySuccessMsg("更新分类名称成功");
