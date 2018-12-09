@@ -45,6 +45,7 @@ public class CategoryManageController {
 
     /**
      * 添加商品分类
+     * 注意：没有父分类的
      *
      * @param session      session域
      * @param categoryName 商品分类名称

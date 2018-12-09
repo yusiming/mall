@@ -29,11 +29,9 @@ public class CategoryServiceImpl implements ICategoryService {
     private Logger logger = LoggerFactory.getLogger(CategoryServiceImpl.class);
 
     /**
-     * 添加商品分类
-     *
-     * @param categoryName 要添加的分类的名称
-     * @param parentId     父节点id
-     * @return
+     * @param categoryName 商品分类名称
+     * @param parentId     父id号
+     * @return 响应
      */
     @Override
     public ServerResponse<String> addCategory(String categoryName, Integer parentId) {

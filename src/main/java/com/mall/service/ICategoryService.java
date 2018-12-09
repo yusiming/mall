@@ -10,7 +10,13 @@ import java.util.List;
  * @Date 2018/11/25 10:34
  */
 public interface ICategoryService {
-    ServerResponse<String> addCategory(String categoryName, Integer parentId);
+    /**
+     * 添加商品分类
+     * @param categoryName 商品分类名称
+     * @param parentId 父id号
+     * @return 若添加成功，返回成功的响应，否则返回错误的响应
+     */
+    ServerResponse addCategory(String categoryName, Integer parentId);
 
     ServerResponse<String> updateCategoryName(Integer categoryId, String categoryName);
 
