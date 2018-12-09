@@ -75,14 +75,14 @@ public class CategoryServiceImpl implements ICategoryService {
     }
 
     /**
-     * 查询指定分类下所有的子分类
+     * 根据商品id查询该分类下的子分类
      *
-     * @param categoryId 要查询的分类
-     * @return
+     * @param categoryId 分类的id
+     * @return 响应
      */
     @Override
     public ServerResponse<List<Category>> getChildrenParallelCategory(Integer categoryId) {
-        // 即使list中没有元素，mybatis返回的list，是不会为null的，而返回没有元素的list
+        // 注意：这里即使没有查询到任何子分类，也不认为是逻辑错误，直接返回一个空的集合即可
         List<Category> list = categoryMapper.selectChildrenCategoryByParentId(categoryId);
         if (CollectionUtils.isEmpty(list)) {
             logger.info("未找到当前分类的子分类:" + categoryId);
@@ -91,9 +91,7 @@ public class CategoryServiceImpl implements ICategoryService {
     }
 
     /**
-     * 递归查询本分类以及子分类的id
-     *
-     * @param categoryId 分类id
+     * @param categoryId
      * @return
      */
     public ServerResponse<List<Integer>> selectCategoryAndChildrenById(Integer categoryId) {

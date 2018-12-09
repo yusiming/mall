@@ -28,6 +28,13 @@ public interface ICategoryService {
      */
     ServerResponse updateCategoryName(Integer categoryId, String categoryName);
 
+    /**
+     * 根据商品id查询该分类下的子分类
+     * 注意：不进行递归查询，只查询一层子分类，子分类的子分类不会被查询出来
+     *
+     * @param categoryId 分类的id
+     * @return 包含一个集合的响应对象
+     */
     ServerResponse<List<Category>> getChildrenParallelCategory(Integer categoryId);
 
     ServerResponse<List<Integer>> selectCategoryAndChildrenById(Integer categoryId);

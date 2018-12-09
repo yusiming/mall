@@ -83,11 +83,11 @@ public class CategoryManageController {
     }
 
     /**
-     * 查询某个商品分类下的一级分类，不递归查询
+     * 查询某个商品分类下的一层子分类，不递归查询
      *
      * @param session    session域
      * @param categoryId 商品分类id
-     * @return
+     * @return 响应
      */
     @RequestMapping(value = "get_category.do")
     @ResponseBody
