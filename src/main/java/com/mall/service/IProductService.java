@@ -20,8 +20,14 @@ public interface IProductService {
 
     ServerResponse<PageInfo> searchProduct(String productName, Integer productId, int pageNum, int pageSize);
 
+    /**
+     * 根据商品id获取商品详细信息
+     *
+     * @param productId 商品id
+     * @return 如果查询成功，返回正确的响应，否则返回错误的响应
+     */
     ServerResponse getProductDetail(Integer productId);
 
     ServerResponse<PageInfo> getProductsByKeywordCategory(String keyword, Integer categoryId, int pageNum, int pageSize,
-                                                String orderBy);
+                                                          String orderBy);
 }

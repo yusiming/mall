@@ -126,11 +126,11 @@ public class ProductServiceImpl implements IProductService {
         // imageHost
         productDetailVo.setImageHost(PropertiesUtil.getProperty("ftp.server.http.prefix", "http://image.mall.com/"));
         // parentCategoryId
-        Category category = categoryMapper.selectByPrimaryKey(product.getCategoryId());
-        if (category == null) {
+        Integer parentCategoryId = categoryMapper.getParentCategoryId(product.getCategoryId());
+        if (parentCategoryId == null) {
             productDetailVo.setParentCategoryId(0);
         } else {
-            productDetailVo.setParentCategoryId(category.getParentId());
+            productDetailVo.setParentCategoryId(parentCategoryId);
         }
         // createTime
         productDetailVo.setCreateTime(DateTimeUtil.DateToStr(product.getCreateTime()));
@@ -180,6 +180,12 @@ public class ProductServiceImpl implements IProductService {
         return ServerResponse.createBySuccess(pageResult);
     }
 
+    /**
+     * 根据商品id查询商品信息
+     *
+     * @param productId 商品id
+     * @return 响应
+     */
     public ServerResponse getProductDetail(Integer productId) {
         if (productId == null) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(),

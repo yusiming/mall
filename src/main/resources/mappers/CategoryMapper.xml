@@ -26,6 +26,11 @@
         <include refid="Base_Column_List"/>
         from mall_category where parent_id = #{parentId}
     </select>
+    <select id="getParentCategoryId" resultType="java.lang.Integer">
+        select parent_id
+        from mall_category
+        where id = #{id}
+    </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
         delete from mall_category

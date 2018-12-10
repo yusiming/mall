@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
+ * 前台商品接口
+ *
  * @Auther yusiming
  * @Date 2018/11/26 21:25
  */
@@ -20,6 +22,12 @@ public class ProductController {
     @Autowired
     private IProductService iProductService;
 
+    /**
+     * 根据商品id查询商品详细信息
+     *
+     * @param productId 商品id
+     * @return 响应
+     */
     @RequestMapping("detail.do")
     @ResponseBody
     public ServerResponse detail(Integer productId) {
