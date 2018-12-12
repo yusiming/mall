@@ -51,7 +51,7 @@ public class FileServiceImpl implements IFileService {
             // 将文件上传到ftp服务器中
             FTPUtil.uploadFile(Lists.newArrayList(targetFile));
             // 删除临时文件
-            if (targetFile.delete()) {
+            if (!targetFile.delete()) {
                 logger.warn("删除上传临时文件失败!");
             }
         } catch (IOException e) {

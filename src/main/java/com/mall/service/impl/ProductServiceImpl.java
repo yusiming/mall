@@ -51,7 +51,8 @@ public class ProductServiceImpl implements IProductService {
                 product.setMainImage(subImagesArray[0]);
             }
             if (product.getId() != null) {
-                if (productMapper.updateByPrimaryKey(product) > 0) {
+                product.setUpdateTime(new Date());
+                if (productMapper.updateByPrimaryKeySelective(product) > 0) {
                     return ServerResponse.createBySuccessMsg("更新商品信息成功");
                 } else {
                     return ServerResponse.createBySuccessMsg("更新商品信息失败");

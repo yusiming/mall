@@ -190,9 +190,6 @@
             <if test="status != null">
                 status = #{status,jdbcType=INTEGER},
             </if>
-            <if test="createTime != null">
-                create_time = #{createTime,jdbcType=TIMESTAMP},
-            </if>
             <if test="updateTime != null">
                 update_time = now(),
             </if>
@@ -210,7 +207,6 @@
             price       = #{price,jdbcType=DECIMAL},
             stock       = #{stock,jdbcType=INTEGER},
             status      = #{status,jdbcType=INTEGER},
-            create_time = #{createTime,jdbcType=TIMESTAMP},
             update_time = now()
         where id = #{id,jdbcType=INTEGER}
     </update>

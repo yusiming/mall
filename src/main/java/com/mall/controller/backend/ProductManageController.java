@@ -8,7 +8,6 @@ import com.mall.pojo.Product;
 import com.mall.pojo.User;
 import com.mall.service.IFileService;
 import com.mall.service.IProductService;
-import com.mall.service.IUserService;
 import com.mall.util.PropertiesUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -31,8 +30,6 @@ import java.util.Map;
 @Controller
 @RequestMapping("/manage/product/")
 public class ProductManageController {
-    @Autowired
-    private IUserService iUserService;
     @Autowired
     private IProductService iProductService;
     @Autowired
@@ -64,7 +61,7 @@ public class ProductManageController {
      */
     @RequestMapping("save_product.do")
     @ResponseBody
-    public ServerResponse productSave(HttpSession session, @RequestParam(value = "product") Product product) {
+    public ServerResponse productSave(HttpSession session, Product product) {
         ServerResponse response = checkAdmin(session);
         if (response.isSuccess()) {
             return iProductService.saveOrUpdateProduct(product);
