@@ -174,6 +174,14 @@ public class ProductManageController {
         return response;
     }
 
+    /**
+     * 富文本图片上传
+     *
+     * @param file            MultipartFile
+     * @param session         session域
+     * @param servletResponse HttpServletResponse
+     * @return 返回simditor要求的响应
+     */
     @RequestMapping(value = "richText_img_upload.do", method = RequestMethod.POST)
     @ResponseBody
     public Map richTextImgUpload(@RequestParam(value = "uploadFile", required = false) MultipartFile file,
@@ -192,7 +200,7 @@ public class ProductManageController {
             map.put("msg", "未登陆");
             return map;
         }
-        if (iUserService.checkAdminRole(user).isSuccess()) {
+        if (user.getRole() == Const.Role.ROLE_ADMIN) {
             String upload = session.getServletContext().getRealPath("upload");
             // 将文件上传到ftp服务中，返回targetFileName，上传文件的名称
             String targetFileName = iFileService.upload(file, upload);
@@ -201,6 +209,7 @@ public class ProductManageController {
             map.put("success", true);
             map.put("msg", "上传成功");
             map.put("file_path", url);
+            // 必须要添加一个响应头
             servletResponse.addHeader("Access-Controller-Allow-Headers", "X-File-Name");
             return map;
         } else {
