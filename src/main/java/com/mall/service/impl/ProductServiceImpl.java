@@ -145,6 +145,13 @@ public class ProductServiceImpl implements IProductService {
         return productDetailVo;
     }
 
+    /**
+     * 后台查询所有商品
+     *
+     * @param pageNum  第几页商品
+     * @param pageSize 每页几条记录
+     * @return 响应
+     */
     public ServerResponse<PageInfo> getProductList(int pageNum, int pageSize) {
         // startPage
         PageHelper.startPage(pageNum, pageSize);
@@ -177,8 +184,17 @@ public class ProductServiceImpl implements IProductService {
         return productListVo;
     }
 
+    /**
+     * 根据商品名称或者id查询商品信息
+     *
+     * @param productName 商品名称
+     * @param productId   商品id
+     * @param pageNum     第几页
+     * @param pageSize    每页几条记录
+     * @return 响应
+     */
     public ServerResponse<PageInfo> searchProduct(String productName, Integer productId, int pageNum, int pageSize) {
-        PageHelper.offsetPage(pageNum, pageSize);
+        PageHelper.startPage(pageNum, pageSize);
         if (StringUtils.isNotBlank(productName)) {
             productName = new StringBuilder("%").append(productName).append("%").toString();
         }

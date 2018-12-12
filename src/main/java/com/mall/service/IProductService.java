@@ -31,13 +31,30 @@ public interface IProductService {
     /**
      * 后台根据商品id查询商品详细信息
      *
-     * @param productId  商品id
+     * @param productId 商品id
      * @return 如果查询成功，返回正确的响应，否则返回错误的响应
      */
     ServerResponse<ProductDetailVo> manageProductDetail(Integer productId);
 
+    /**
+     * 后台查询所有商品，查询第pageNum页商品，每页pageSize个商品
+     *
+     * @param pageNum  第几页商品
+     * @param pageSize 每页几条记录
+     * @return 返回响应
+     */
     ServerResponse getProductList(int pageNum, int pageSize);
 
+    /**
+     * 根据商品名称或者id查询商品信息
+     * 如果是根据商品名称，可能需要分页
+     *
+     * @param productName 商品名称
+     * @param productId   商品id
+     * @param pageNum     第几页
+     * @param pageSize    每页几条记录
+     * @return 返回响应
+     */
     ServerResponse<PageInfo> searchProduct(String productName, Integer productId, int pageNum, int pageSize);
 
     /**

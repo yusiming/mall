@@ -73,7 +73,7 @@ public class ProductManageController {
     }
 
     /**
-     * 设置商品的销售状态
+     * 设置商品的销售状态（产品上下架）
      *
      * @param session   session域对象
      * @param productId 商品的id
@@ -107,6 +107,15 @@ public class ProductManageController {
         return response;
     }
 
+    /**
+     * 查询所有商品
+     * 需要分页，默认查询第一页，每页10条记录
+     *
+     * @param session  session域
+     * @param pageNum  第几页
+     * @param pageSize 每页的记录数
+     * @return 响应
+     */
     @RequestMapping("get_product_list.do")
     @ResponseBody
     public ServerResponse getProductList(HttpSession session,
@@ -120,14 +129,13 @@ public class ProductManageController {
     }
 
     /**
-     * 根据商品名称、商品id搜索商品
      *
-     * @param session
-     * @param productName
-     * @param productId
-     * @param pageNum
-     * @param pageSize
-     * @return
+     * @param session     session域
+     * @param productName 需要查询的商品名称
+     * @param productId   需要查询的商品id
+     * @param pageNum     第几页
+     * @param pageSize    每页几条数据
+     * @return 响应
      */
     @RequestMapping("search_product.do")
     @ResponseBody
