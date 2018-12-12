@@ -10,6 +10,13 @@ import com.mall.vo.ProductDetailVo;
  * @Date 2018/11/25 19:05
  */
 public interface IProductService {
+    /**
+     * 保存或者更新商品信息
+     * 如果Product存在id，则是更新商品信息，否则就是添加商品信息
+     *
+     * @param product 需要保存或者更新的商品信息
+     * @return 如果保存或者更新商品信息成功，返回正确的响应，否则返回错误的响应
+     */
     ServerResponse saveOrUpdateProduct(Product product);
 
     ServerResponse<String> setSaleStatus(Integer productId, Integer status);

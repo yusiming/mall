@@ -40,25 +40,26 @@ public class ProductServiceImpl implements IProductService {
      * 新增或者更新商品，如果product有id，则更新商品信息，否则新增商品
      *
      * @param product 商品对象
-     * @return
+     * @return 响应
      */
     public ServerResponse saveOrUpdateProduct(Product product) {
         if (product != null) {
+            // 设置商品主图
             if (StringUtils.isNotBlank(product.getSubImages())) {
                 String[] subImagesArray = product.getSubImages().split(",");
                 product.setMainImage(subImagesArray[0]);
             }
             if (product.getId() != null) {
                 if (productMapper.updateByPrimaryKey(product) > 0) {
-                    ServerResponse.createBySuccessMsg("更新商品信息成功");
+                    return ServerResponse.createBySuccessMsg("更新商品信息成功");
                 } else {
-                    ServerResponse.createBySuccessMsg("更新商品信息失败");
+                    return ServerResponse.createBySuccessMsg("更新商品信息失败");
                 }
             } else {
                 if (productMapper.insert(product) > 0) {
-                    ServerResponse.createBySuccessMsg("新增商品成功");
+                    return ServerResponse.createBySuccessMsg("新增商品成功");
                 } else {
-                    ServerResponse.createBySuccessMsg("新增商品失败");
+                    return ServerResponse.createBySuccessMsg("新增商品失败");
                 }
             }
         }
