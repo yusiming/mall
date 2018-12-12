@@ -92,7 +92,7 @@ public class ProductServiceImpl implements IProductService {
     }
 
     /**
-     * 查询商品详情
+     * 后台查询商品详情
      *
      * @param productId 商品id
      * @return 方法将返回包装了的vo的响应
@@ -158,6 +158,12 @@ public class ProductServiceImpl implements IProductService {
         return ServerResponse.createBySuccess(pageResult);
     }
 
+    /**
+     * 通过Product对象组装ProductListVo
+     *
+     * @param product Product对象
+     * @return 组装之后的ProductListVo
+     */
     private ProductListVo assembleProductListVo(Product product) {
         ProductListVo productListVo = new ProductListVo();
         productListVo.setId(product.getId());

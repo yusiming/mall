@@ -28,6 +28,12 @@ public interface IProductService {
      */
     ServerResponse<String> setSaleStatus(Integer productId, Integer status);
 
+    /**
+     * 后台根据商品id查询商品详细信息
+     *
+     * @param productId  商品id
+     * @return 如果查询成功，返回正确的响应，否则返回错误的响应
+     */
     ServerResponse<ProductDetailVo> manageProductDetail(Integer productId);
 
     ServerResponse getProductList(int pageNum, int pageSize);
@@ -43,7 +49,7 @@ public interface IProductService {
     ServerResponse getProductDetail(Integer productId);
 
     /**
-     * 产品搜索以及动态排序
+     * 前台产品搜索以及动态排序
      *
      * @param keyword    关键字
      * @param categoryId 分类id

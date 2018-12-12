@@ -95,7 +95,7 @@ public class ProductManageController {
      *
      * @param session   session
      * @param productId 商品id
-     * @return
+     * @return 响应
      */
     @RequestMapping("get_product_detail.do")
     @ResponseBody
