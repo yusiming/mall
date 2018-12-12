@@ -129,7 +129,6 @@ public class ProductManageController {
     }
 
     /**
-     *
      * @param session     session域
      * @param productName 需要查询的商品名称
      * @param productId   需要查询的商品id
@@ -152,9 +151,9 @@ public class ProductManageController {
     /**
      * 图片上传
      *
-     * @param file
-     * @param session
-     * @return
+     * @param file    MultipartFile
+     * @param session session域
+     * @return 响应，包含uri和url
      */
     @RequestMapping(value = "upload_image.do", method = RequestMethod.POST)
     @ResponseBody

@@ -11,6 +11,7 @@ import java.util.List;
 
 /**
  * FTP客户端工具
+ * 注意这里有一个坑，如果ftpuser对目录没有w权限是不能将文件上传到该目录下的
  *
  * @Auther yusiming
  * @Date 2018/11/25 21:46
