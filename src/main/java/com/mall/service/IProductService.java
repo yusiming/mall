@@ -28,6 +28,16 @@ public interface IProductService {
      */
     ServerResponse getProductDetail(Integer productId);
 
+    /**
+     * 产品搜索以及动态排序
+     *
+     * @param keyword    关键字
+     * @param categoryId 分类id
+     * @param pageNum    页号
+     * @param pageSize   每页几条数据
+     * @param orderBy    排序方式
+     * @return 响应
+     */
     ServerResponse<PageInfo> getProductsByKeywordCategory(String keyword, Integer categoryId, int pageNum, int pageSize,
                                                           String orderBy);
 }
