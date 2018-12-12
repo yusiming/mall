@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -71,16 +72,19 @@ public class ProductServiceImpl implements IProductService {
      *
      * @param productId 商品id
      * @param status    商品新的状态
-     * @return
+     * @return 响应
      */
     public ServerResponse<String> setSaleStatus(Integer productId, Integer status) {
         if (productId == null || status == null) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(),
                     ResponseCode.ILLEGAL_ARGUMENT.getDesc());
         }
+        // 创建一个用于更新商品状态的对象
         Product product = new Product();
         product.setId(productId);
         product.setStatus(status);
+        // 设置更新时间
+        product.setUpdateTime(new Date());
         if (productMapper.updateByPrimaryKeySelective(product) > 0) {
             return ServerResponse.createBySuccessMsg("修改商品状态成功");
         }

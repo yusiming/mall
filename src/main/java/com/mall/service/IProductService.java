@@ -19,6 +19,13 @@ public interface IProductService {
      */
     ServerResponse saveOrUpdateProduct(Product product);
 
+    /**
+     * 根据商品的id，设置商品的销售状态
+     *
+     * @param productId 商品id
+     * @param status    商品状态
+     * @return 如果设置商品状态成功，返回成功的响应，否则返回错误的响应
+     */
     ServerResponse<String> setSaleStatus(Integer productId, Integer status);
 
     ServerResponse<ProductDetailVo> manageProductDetail(Integer productId);

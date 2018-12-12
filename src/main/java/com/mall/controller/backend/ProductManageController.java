@@ -78,7 +78,7 @@ public class ProductManageController {
      * @param session   session域对象
      * @param productId 商品的id
      * @param status    商品新的的状态
-     * @return
+     * @return 响应
      */
     @RequestMapping("set_sale_status.do")
     @ResponseBody
@@ -164,7 +164,7 @@ public class ProductManageController {
             map.put("url", url);
             return ServerResponse.createBySuccess(map);
         }
-       return response;
+        return response;
     }
 
     @RequestMapping(value = "richText_img_upload.do", method = RequestMethod.POST)
