@@ -45,38 +45,36 @@ public class CartController {
     /**
      * 更新购物车中的商品数量
      *
-     * @param session
-     * @param productId
-     * @param count
-     * @return
+     * @param session   session域
+     * @param productId 商品id
+     * @param count     商品的数量
+     * @return 响应
      */
     @RequestMapping("update.do")
     @ResponseBody
     public ServerResponse update(HttpSession session, Integer productId, Integer count) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
-        if (user != null) {
-            return iCartService.update(user.getId(), productId, count);
+        ServerResponse<User> response = checkLogin(session);
+        if (response.isSuccess()) {
+            return iCartService.update(response.getData().getId(), productId, count);
         }
-        return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
-                ResponseCode.NEED_LOGIN.getDesc());
+        return response;
     }
 
     /**
-     * 删除购物车中的商品
+     * 删除购物车中的商品，有可能传入多个商品id
      *
-     * @param session
-     * @param productIds
-     * @return
+     * @param session    session域
+     * @param productIds 商品id
+     * @return 响应
      */
     @RequestMapping("delete.do")
     @ResponseBody
     public ServerResponse delete(HttpSession session, String productIds) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
-        if (user != null) {
-            return iCartService.delete(user.getId(), productIds);
+        ServerResponse<User> response = checkLogin(session);
+        if (response.isSuccess()) {
+            return iCartService.delete(response.getData().getId(), productIds);
         }
-        return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
-                ResponseCode.NEED_LOGIN.getDesc());
+        return response;
     }
 
     /**
