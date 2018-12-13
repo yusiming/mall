@@ -78,21 +78,20 @@ public class CartController {
     }
 
     /**
-     * 查询购物车
+     * 查询用户的购物车数据
      *
-     * @param session
-     * @return
+     * @param session session
+     * @return 响应
      */
     @RequestMapping("list.do")
     @ResponseBody
     public ServerResponse list(HttpSession session) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
-        if (user != null) {
-            return iCartService.list(user.getId());
+        ServerResponse<User> response = checkLogin(session);
+        if (response.isSuccess()) {
+            return iCartService.list(response.getData().getId());
         }
-        return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
-                ResponseCode.NEED_LOGIN.getDesc());
-    }
+        return response;
+}
 
     /**
      * 购物车全选

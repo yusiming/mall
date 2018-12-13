@@ -36,6 +36,12 @@ public interface ICartService {
      */
     ServerResponse delete(Integer userId, String productIds);
 
+    /**
+     * 根据用户id获取用户的购物车数据
+     *
+     * @param userId 用户id
+     * @return 包含了购物车数据的响应对象
+     */
     ServerResponse list(Integer userId);
 
     ServerResponse selectOrUnSelect(Integer userId, Integer productId, Integer checked);
