@@ -54,6 +54,12 @@ public interface ICartService {
      */
     ServerResponse selectOrUnSelect(Integer userId, Integer productId, Integer checked);
 
+    /**
+     * 获取用户的购物车中的商品数量
+     *
+     * @param userId 用户id
+     * @return 响应
+     */
     ServerResponse getCartProductCount(Integer userId);
 
 }

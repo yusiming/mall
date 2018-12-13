@@ -129,6 +129,12 @@ public class CartServiceImpl implements ICartService {
         return this.list(userId);
     }
 
+    /**
+     * 获取购物车中商品的数量
+     *
+     * @param userId 用户id
+     * @return 响应
+     */
     public ServerResponse getCartProductCount(Integer userId) {
         if (userId == null) {
             return ServerResponse.createBySuccess(0);

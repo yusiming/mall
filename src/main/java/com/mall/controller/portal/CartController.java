@@ -166,13 +166,12 @@ public class CartController {
     /**
      * 获取用户购物车中的商品数量
      *
-     * @param session
-     * @param productId
-     * @return
+     * @param session session域
+     * @return 响应
      */
     @RequestMapping("get_product_count.do")
     @ResponseBody
-    public ServerResponse getProductCount(HttpSession session, Integer productId) {
+    public ServerResponse getProductCount(HttpSession session) {
         User user = (User) session.getAttribute(Const.CURRENT_USER);
         if (user != null) {
             return iCartService.getCartProductCount(user.getId());
