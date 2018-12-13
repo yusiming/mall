@@ -128,39 +128,39 @@ public class CartController {
     }
 
     /**
-     * 单独选
+     * 单独选中某个商品
      *
-     * @param session
-     * @param productId
-     * @return
+     * @param session   session域
+     * @param productId 商品id
+     * @return 响应
      */
     @RequestMapping("select.do")
     @ResponseBody
     public ServerResponse Select(HttpSession session, Integer productId) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
-        if (user != null) {
-            return iCartService.selectOrUnSelect(user.getId(), productId, Const.Cart.CHECKED);
+        ServerResponse<User> response = checkLogin(session);
+        if (response.isSuccess()) {
+            return iCartService.selectOrUnSelect(response.getData().getId(), productId, Const.Cart.CHECKED);
+
         }
-        return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
-                ResponseCode.NEED_LOGIN.getDesc());
+        return response;
     }
 
     /**
-     * 单独反选
+     * 单独反选某个商品
      *
-     * @param session
-     * @param productId
-     * @return
+     * @param session   session域
+     * @param productId 商品id
+     * @return 响应
      */
     @RequestMapping("un_select.do")
     @ResponseBody
     public ServerResponse unSelect(HttpSession session, Integer productId) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
-        if (user != null) {
-            return iCartService.selectOrUnSelect(user.getId(), productId, Const.Cart.UN_CHECKED);
+        ServerResponse<User> response = checkLogin(session);
+        if (response.isSuccess()) {
+            return iCartService.selectOrUnSelect(response.getData().getId(), productId, Const.Cart.UN_CHECKED);
+
         }
-        return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
-                ResponseCode.NEED_LOGIN.getDesc());
+        return response;
     }
 
     /**
