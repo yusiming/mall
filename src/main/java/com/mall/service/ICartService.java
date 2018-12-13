@@ -44,6 +44,14 @@ public interface ICartService {
      */
     ServerResponse list(Integer userId);
 
+    /**
+     * 设置购物车中商品的选中状态
+     *
+     * @param userId    用户id
+     * @param productId 商品id
+     * @param checked   0代表不选，1代表选中
+     * @return 响应
+     */
     ServerResponse selectOrUnSelect(Integer userId, Integer productId, Integer checked);
 
     ServerResponse getCartProductCount(Integer userId);

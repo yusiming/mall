@@ -115,6 +115,14 @@ public class CartServiceImpl implements ICartService {
         return ServerResponse.createBySuccess(this.getCartVoLimit(userId));
     }
 
+    /**
+     * 设置购物车中的商品的选中状态
+     *
+     * @param userId    用户id
+     * @param productId 商品id
+     * @param checked   0代表不选，1代表选中
+     * @return 响应
+     */
     @Override
     public ServerResponse selectOrUnSelect(Integer userId, Integer productId, Integer checked) {
         cartMapper.checkedOrUnCheckedProduct(userId, productId, checked);
