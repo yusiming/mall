@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpSession;
 
 /**
+ * 前台购物车接口
+ *
  * @Auther yusiming
  * @Date 2018/11/29 19:17
  */
@@ -33,16 +35,11 @@ public class CartController {
     @RequestMapping("add.do")
     @ResponseBody
     public ServerResponse add(HttpSession session, Integer productId, Integer count) {
-        if (productId == null || count == null) {
-            return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(),
-                    ResponseCode.ILLEGAL_ARGUMENT.getDesc());
+        ServerResponse<User> response = checkLogin(session);
+        if (response.isSuccess()) {
+            return iCartService.add(response.getData().getId(), productId, count);
         }
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
-        if (user != null) {
-            return iCartService.add(user.getId(), productId, count);
-        }
-        return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
-                ResponseCode.NEED_LOGIN.getDesc());
+        return response;
     }
 
     /**
@@ -186,4 +183,18 @@ public class CartController {
         return ServerResponse.createBySuccess(0);
     }
 
+    /**
+     * 校验用户是否已登陆
+     *
+     * @param session session域
+     * @return 如果用户已经登陆，返回成功的响应，否则返回错误的响应
+     */
+    private ServerResponse<User> checkLogin(HttpSession session) {
+        User user = (User) session.getAttribute(Const.CURRENT_USER);
+        if (user == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
+                    ResponseCode.NEED_LOGIN.getDesc());
+        }
+        return ServerResponse.createBySuccess(user);
+    }
 }

@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.List;
 
 /**
+ * 购物车对应的抽象对象
+ *
  * @Auther yusiming
  * @Date 2018/11/29 19:44
  */

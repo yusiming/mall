@@ -9,6 +9,7 @@ import java.math.BigDecimal;
  * @Date 2018/11/29 19:39
  */
 public class CartProductVo {
+    // 购物车id
     private Integer id;
     private Integer userId;
     private Integer productId;

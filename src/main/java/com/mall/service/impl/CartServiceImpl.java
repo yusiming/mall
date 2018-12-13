@@ -38,28 +38,30 @@ public class CartServiceImpl implements ICartService {
      * @param userId    用户id
      * @param productId 商品id
      * @param count     商品数量
-     * @return
+     * @return 响应
      */
     public ServerResponse add(Integer userId, Integer productId, Integer count) {
         if (productId == null || count == null) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(),
                     ResponseCode.ILLEGAL_ARGUMENT.getDesc());
         }
+        // 获取该商品对应的购物车对象
         Cart cart = cartMapper.selectByUserIdAndProductId(userId, productId);
-        // 如果cart为null，证明这个商品不该用户的购物车中，需要新增一个这个商品的记录，并插入到Cart表中
+        // 如果cart为null，证明这个商品不在用户的购物车中，需要新增一个这个商品的记录，并插入到Cart表中
         if (cart == null) {
             cart = new Cart();
             cart.setUserId(userId);
             cart.setProductId(productId);
             cart.setQuantity(count);
             cart.setChecked(Const.Cart.CHECKED);
-            // 持久化到数据库中
+            // 将购物车数据持久化到数据库中
             cartMapper.insert(cart);
         } else {
             // 如果cart不为null，证明这个用户的购物车中已经存在该商品了，将数据量相加即可
             cart.setQuantity(cart.getQuantity() + count);
             cartMapper.updateByPrimaryKeySelective(cart);
         }
+        // 返回用户的购物车数据
         return this.list(userId);
     }
 
@@ -87,6 +89,12 @@ public class CartServiceImpl implements ICartService {
         return this.list(userId);
     }
 
+    /**
+     * 返回该用户对应的购物车数据
+     *
+     * @param userId 用户id
+     * @return 包装了购物车数据的响应对象
+     */
     public ServerResponse list(Integer userId) {
         return ServerResponse.createBySuccess(this.getCartVoLimit(userId));
     }
@@ -105,8 +113,15 @@ public class CartServiceImpl implements ICartService {
 
     }
 
-    public CartVo getCartVoLimit(Integer userId) {
+    /**
+     * 通过用户id，获取该用户对应的CartVo对象
+     *
+     * @param userId 用户id
+     * @return CartVo对象
+     */
+    private CartVo getCartVoLimit(Integer userId) {
         CartVo cartVo = new CartVo();
+        // 查询该用户所有的购物记录
         List<Cart> cartList = cartMapper.selectByUserId(userId);
         List<CartProductVo> cartProductVoList = Lists.newArrayList();
         BigDecimal cartTotalPrice = new BigDecimal("0");
@@ -131,10 +146,12 @@ public class CartServiceImpl implements ICartService {
 
                     // 判断库存数量
                     int buyLimitCount = 0;
+                    // 如果库存数量大于购物车中的数量，LIMIT_NUM_SUCCESS
                     if (product.getStock() >= cart.getQuantity()) {
                         buyLimitCount = cart.getQuantity();
                         cartProductVo.setLimitQuantity(Const.Cart.LIMIT_NUM_SUCCESS);
                     } else {
+                        // 如果库存数量小于购物车中的数量，LIMIT_NUM_FAIL
                         buyLimitCount = product.getStock();
                         cartProductVo.setLimitQuantity(Const.Cart.LIMIT_NUM_FAIL);
                         // 更新购物车中的数量为product的stock
@@ -165,6 +182,12 @@ public class CartServiceImpl implements ICartService {
         return cartVo;
     }
 
+    /**
+     * 判断用户的购物车中的所有商品是否是全选状态
+     *
+     * @param userId 用户id
+     * @return 如果是全选状态，返回true，否则返回false
+     */
     private boolean getAllCheckedStatus(Integer userId) {
         if (userId == null) {
             return false;
