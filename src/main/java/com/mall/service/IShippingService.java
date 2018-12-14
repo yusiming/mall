@@ -35,6 +35,13 @@ public interface IShippingService {
      */
     ServerResponse update(Integer userId, Shipping shipping);
 
+    /**
+     * 根据用户id，查询地址详情
+     *
+     * @param userId     用户id
+     * @param shippingId 收货地址详情
+     * @return 如果查询成功，返回包含了地址信息的响应对象，否则返回错误的响应信息
+     */
     ServerResponse select(Integer userId, Integer shippingId);
 
     ServerResponse list(Integer id, int pageNum, int pageSize);

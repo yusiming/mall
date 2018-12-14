@@ -77,6 +77,13 @@ public class ShippingServiceImpl implements IShippingService {
         return ServerResponse.createByErrorMessage("更新地址信息失败");
     }
 
+    /**
+     * 根据用户id，查询地址详情
+     *
+     * @param userId     用户id
+     * @param shippingId 收货地址详情
+     * @return 响应
+     */
     @Override
     public ServerResponse select(Integer userId, Integer shippingId) {
         Shipping shipping = shippingMapper.selectByShippingIdAndUserId(shippingId, userId);

@@ -97,19 +97,18 @@ public class ShippingController {
     /**
      * 查询地址详情
      *
-     * @param session
-     * @param shippingId
-     * @return
+     * @param session    session
+     * @param shippingId 代表收货地址的简单对象
+     * @return 响应
      */
     @RequestMapping("select.do")
     @ResponseBody
     public ServerResponse select(HttpSession session, Integer shippingId) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
-        if (user != null) {
-            return iShippingService.select(user.getId(), shippingId);
+        ServerResponse<User> response = checkLogin(session);
+        if (response.isSuccess()) {
+            return iShippingService.select(response.getData().getId(), shippingId);
         }
-        return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
-                ResponseCode.NEED_LOGIN.getDesc());
+        return response;
     }
 
     /**
