@@ -79,19 +79,19 @@ public class ShippingController {
     /**
      * 更新用户地址信息
      *
-     * @param session
-     * @param shipping
-     * @return
+     * @param session  session域
+     * @param shipping 代表收货地址的简单对象
+     * @return 响应
      */
     @RequestMapping("update.do")
     @ResponseBody
     public ServerResponse update(HttpSession session, Shipping shipping) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
-        if (user != null) {
-            return iShippingService.update(user.getId(), shipping);
+        ServerResponse<User> response = checkLogin(session);
+        if (response.isSuccess()) {
+            return iShippingService.update(response.getData().getId(), shipping);
         }
-        return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
-                ResponseCode.NEED_LOGIN.getDesc());
+        return response;
+
     }
 
     /**

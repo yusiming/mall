@@ -58,6 +58,13 @@ public class ShippingServiceImpl implements IShippingService {
         return ServerResponse.createByErrorMessage("删除地址失败");
     }
 
+    /**
+     * 更新用户地址信息
+     *
+     * @param userId   用户id
+     * @param shipping 地址对象
+     * @return 响应
+     */
     @Override
     public ServerResponse update(Integer userId, Shipping shipping) {
         // 注意，这里要将session中拿到的id，赋值给shipping对象，以为前端传过来的id是可以模拟的，有可能收到加的userId

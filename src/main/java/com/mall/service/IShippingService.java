@@ -26,6 +26,13 @@ public interface IShippingService {
      */
     ServerResponse del(Integer userId, Integer shippingId);
 
+    /**
+     * 根据用户id，更新用户的地址信息
+     *
+     * @param userId   用户id
+     * @param shipping 地址对象
+     * @return 如果更新地址成功，返回成功的提示信息，否则返回失败的提示信息
+     */
     ServerResponse update(Integer userId, Shipping shipping);
 
     ServerResponse select(Integer userId, Integer shippingId);
