@@ -44,9 +44,9 @@ public class ShippingServiceImpl implements IShippingService {
     /**
      * 删除用户收货地址
      *
-     * @param userId
-     * @param shippingId
-     * @return
+     * @param userId     用户id
+     * @param shippingId 说货地址id
+     * @return 响应
      */
     @Override
     public ServerResponse del(Integer userId, Integer shippingId) {

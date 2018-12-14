@@ -62,19 +62,18 @@ public class ShippingController {
     /**
      * 删除用户收货地址
      *
-     * @param session
-     * @param shippingId
-     * @return
+     * @param session    session域
+     * @param shippingId 收货地址id
+     * @return 响应
      */
     @RequestMapping("del.do")
     @ResponseBody
     public ServerResponse del(HttpSession session, Integer shippingId) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
-        if (user != null) {
-            return iShippingService.del(user.getId(), shippingId);
+        ServerResponse<User> response = checkLogin(session);
+        if (response.isSuccess()) {
+            return iShippingService.del(response.getData().getId(), shippingId);
         }
-        return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
-                ResponseCode.NEED_LOGIN.getDesc());
+        return response;
     }
 
     /**

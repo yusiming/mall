@@ -17,6 +17,13 @@ public interface IShippingService {
      */
     ServerResponse add(Integer userId, Shipping shipping);
 
+    /**
+     * 根据用户id和收货地址id删除用户的收货地址
+     *
+     * @param userId     用户id
+     * @param shippingId 说货地址id
+     * @return 如果删除地址成功，返回成功的提示信息，否则返回失败的提示信息
+     */
     ServerResponse del(Integer userId, Integer shippingId);
 
     ServerResponse update(Integer userId, Shipping shipping);
