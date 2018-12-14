@@ -93,6 +93,14 @@ public class ShippingServiceImpl implements IShippingService {
         return ServerResponse.createByErrorMessage("查询不到该地址信息");
     }
 
+    /**
+     * 根据用户id查询用户的地址列表
+     *
+     * @param userId   用户id
+     * @param pageNum  第几页
+     * @param pageSize 每页几条数据
+     * @return 响应
+     */
     @Override
     public ServerResponse list(Integer userId, int pageNum, int pageSize) {
         PageHelper.startPage(pageNum, pageSize);

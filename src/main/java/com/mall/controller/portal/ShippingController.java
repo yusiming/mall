@@ -114,22 +114,21 @@ public class ShippingController {
     /**
      * 用户收货地址列表
      *
-     * @param session
-     * @param pageNum
-     * @param pageSize
-     * @return
+     * @param session  session
+     * @param pageNum  第几页
+     * @param pageSize 每页几条数据
+     * @return 响应
      */
     @RequestMapping("list.do")
     @ResponseBody
     public ServerResponse list(HttpSession session,
                                @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
                                @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
-        if (user != null) {
-            return iShippingService.list(user.getId(), pageNum, pageSize);
+        ServerResponse<User> response = checkLogin(session);
+        if (response.isSuccess()) {
+            return iShippingService.list(response.getData().getId(), pageNum, pageSize);
         }
-        return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
-                ResponseCode.NEED_LOGIN.getDesc());
+        return response;
     }
 
 }

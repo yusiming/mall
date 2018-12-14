@@ -44,5 +44,13 @@ public interface IShippingService {
      */
     ServerResponse select(Integer userId, Integer shippingId);
 
-    ServerResponse list(Integer id, int pageNum, int pageSize);
+    /**
+     * 根据用户id查询用户的地址列表
+     *
+     * @param userId   用户id
+     * @param pageNum  第几页
+     * @param pageSize 每页几条数据
+     * @return 包含了地址列表的响应对象
+     */
+    ServerResponse list(Integer userId, int pageNum, int pageSize);
 }
