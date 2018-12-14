@@ -23,11 +23,11 @@ public class ShippingServiceImpl implements IShippingService {
     private ShippingMapper shippingMapper;
 
     /**
-     * 添加收货地址
+     * 根据用户id添加收货地址
      *
-     * @param userId
-     * @param shipping
-     * @return
+     * @param userId   用户id
+     * @param shipping 简单对象
+     * @return 响应
      */
     public ServerResponse add(Integer userId, Shipping shipping) {
         shipping.setUserId(userId);

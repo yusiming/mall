@@ -27,22 +27,36 @@ public class ShippingController {
     private IShippingService iShippingService;
 
     /**
-     * 添加收货地址
+     * 校验用户是否已登陆
+     *
+     * @param session session域
+     * @return 如果用户已经登陆，返回成功的响应，否则返回错误的响应
+     */
+    private ServerResponse<User> checkLogin(HttpSession session) {
+        User user = (User) session.getAttribute(Const.CURRENT_USER);
+        if (user == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
+                    ResponseCode.NEED_LOGIN.getDesc());
+        }
+        return ServerResponse.createBySuccess(user);
+    }
+
+    /**
+     * 用户添加收货地址
      * 使用springMVC的对象数据绑定
      *
      * @param session  session域
      * @param shipping 收货地址对象
-     * @return
+     * @return 响应
      */
     @RequestMapping("add.do")
     @ResponseBody
     public ServerResponse add(HttpSession session, Shipping shipping) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
-        if (user != null) {
-            return iShippingService.add(user.getId(), shipping);
+        ServerResponse<User> response = checkLogin(session);
+        if (response.isSuccess()) {
+            return iShippingService.add(response.getData().getId(), shipping);
         }
-        return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
-                ResponseCode.NEED_LOGIN.getDesc());
+        return response;
     }
 
     /**
