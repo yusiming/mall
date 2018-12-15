@@ -9,6 +9,14 @@ import java.util.Map;
  * @Date 2018/12/2 19:04
  */
 public interface IOrderService {
+    /**
+     * 用户支付订单
+     *
+     * @param userId  用户id
+     * @param orderNo 订单号
+     * @param path    二维码上传路径
+     * @return 如果支付成功，给前台返回订单号和二维码图片完整地址，否则返回错误的信息
+     */
     ServerResponse pay(Integer userId, long orderNo, String path);
 
     ServerResponse aliCallback(Map<String, String> params);

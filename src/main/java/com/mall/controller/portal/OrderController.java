@@ -28,26 +28,27 @@ import java.util.Map;
 @Controller
 @RequestMapping("/order/")
 public class OrderController {
+
     @Autowired
     private IOrderService iOrderService;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderController.class);
 
     /**
      * 用户创建订单
      *
-     * @param session
-     * @param shippingId
-     * @return
+     * @param session    session域
+     * @param shippingId 用户收货地址信息
+     * @return 响应
      */
     @RequestMapping("create.do")
     @ResponseBody
     public ServerResponse create(HttpSession session, Integer shippingId) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
-        if (user != null) {
-            return iOrderService.createOrder(user.getId(), shippingId);
+        ServerResponse<User> response = checkLogin(session);
+        if (response.isSuccess()) {
+            return iOrderService.createOrder(response.getData().getId(), shippingId);
         }
-        return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
-                ResponseCode.NEED_LOGIN.getDesc());
+        return response;
     }
 
     /**
@@ -87,22 +88,21 @@ public class OrderController {
 
     /**
      * 支付宝支付接口
+     * 订单支付
      *
-     * @param session
-     * @param orderNo
-     * @param request
-     * @return
+     * @param session session域
+     * @param orderNo 订单号
+     * @return 响应
      */
     @RequestMapping("pay.do")
     @ResponseBody
-    public ServerResponse pay(HttpSession session, long orderNo, HttpServletRequest request) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
-        if (user != null) {
+    public ServerResponse pay(HttpSession session, long orderNo) {
+        ServerResponse<User> response = checkLogin(session);
+        if (response.isSuccess()) {
             String path = session.getServletContext().getRealPath("upload");
-            return iOrderService.pay(user.getId(), orderNo, path);
+            return iOrderService.pay(response.getData().getId(), orderNo, path);
         }
-        return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
-                ResponseCode.NEED_LOGIN.getDesc());
+        return response;
     }
 
     /**
@@ -215,6 +215,21 @@ public class OrderController {
         }
         return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
                 ResponseCode.NEED_LOGIN.getDesc());
+    }
+
+    /**
+     * 校验用户是否已登陆
+     *
+     * @param session session域
+     * @return 如果用户已经登陆，返回成功的响应，否则返回错误的响应
+     */
+    private ServerResponse<User> checkLogin(HttpSession session) {
+        User user = (User) session.getAttribute(Const.CURRENT_USER);
+        if (user == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
+                    ResponseCode.NEED_LOGIN.getDesc());
+        }
+        return ServerResponse.createBySuccess(user);
     }
 
 }

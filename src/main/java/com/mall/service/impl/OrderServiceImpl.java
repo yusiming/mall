@@ -46,6 +46,10 @@ import java.util.*;
 @Service("iOrderService")
 public class OrderServiceImpl implements IOrderService {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderServiceImpl.class);
+    /**
+     * AlipayTradeService可以使用单例或者为静态成员对象，不需要反复new
+     */
+    private static AlipayTradeService tradeService;
     @Autowired
     private OrderMapper orderMapper;
     @Autowired
@@ -60,12 +64,22 @@ public class OrderServiceImpl implements IOrderService {
     private ShippingMapper shippingMapper;
 
     static {
-        /** 一定要在创建AlipayTradeService之前调用Configs.init()设置默认参数
-         *  Configs会读取classpath下的zfbinfo.properties文件配置信息，如果找不到该文件则确认该文件是否在classpath目录
+        /*
+         * 一定要在创建AlipayTradeService之前调用Configs.init()设置默认参数
+         * Configs会读取classpath下的zfbinfo.properties文件配置信息，如果找不到该文件则确认该文件是否在classpath目录
          */
         Configs.init("zfbinfo.properties");
+        tradeService = new AlipayTradeServiceImpl.ClientBuilder().build();
     }
 
+    /**
+     * 用户支付订单
+     *
+     * @param userId  用户id
+     * @param orderNo 订单号
+     * @param path    二维码上传路径
+     * @return 响应
+     */
     @Override
     public ServerResponse pay(Integer userId, long orderNo, String path) {
         Map<String, String> map = Maps.newHashMap();
@@ -73,11 +87,12 @@ public class OrderServiceImpl implements IOrderService {
         if (order == null) {
             return ServerResponse.createByErrorMessage("用户没有该订单");
         }
-        map.put("orderNo", String.valueOf(orderNo));
+        // 需要给前台返回orderNo
+        map.put("orderNo", Long.toString(orderNo));
 
         // (必填) 商户网站订单系统中唯一订单号，64个字符以内，只能包含字母、数字、下划线，
         // 需保证商户系统端不能重复，建议通过数据库sequence生成，
-        String outTradeNo = String.valueOf(orderNo);
+        String outTradeNo = Long.toString(orderNo);
 
         // (必填) 订单标题，粗略描述用户的支付目的。如“xxx品牌xxx门店当面付扫码消费”
         String subject = "mall扫码支付";
@@ -95,7 +110,7 @@ public class OrderServiceImpl implements IOrderService {
         String sellerId = "";
 
         // 订单描述，可以对交易或商品进行一个详细地描述，比如填写"购买商品2件共15.00元"
-        String body = new StringBuilder().append("订单").append(outTradeNo).append("购买商品共").append(totalAmount)
+        String body = new StringBuilder("订单").append(outTradeNo).append("购买商品共").append(totalAmount)
                 .append("元").toString();
 
         // 商户操作员编号，添加此参数可以为商户操作员做销售统计
@@ -112,12 +127,13 @@ public class OrderServiceImpl implements IOrderService {
         String timeoutExpress = "120m";
 
         // 商品明细列表，需填写购买商品详细信息，
-        List<GoodsDetail> goodsDetailList = new ArrayList<GoodsDetail>();
+        List<GoodsDetail> goodsDetailList = new ArrayList<>();
+        // 获取所有的订单所有的订单项
         List<OrderItem> orderItemList = orderItemMapper.selectAllByUserIdAndOrderNo(userId, orderNo);
         for (OrderItem orderItem : orderItemList) {
+            // 商品id、商品名称、商品单价（单价为分）、商品数量
             goodsDetailList.add(GoodsDetail.newInstance(orderItem.getProductId().toString(), orderItem.getProductName(),
-                    BigDecimalUtil.mul(orderItem.getCurrentUnitPrice().doubleValue(),
-                            100d).longValue(),
+                    BigDecimalUtil.mul(orderItem.getCurrentUnitPrice().doubleValue(), 100.0d).longValue(),
                     orderItem.getQuantity()));
         }
 
@@ -127,17 +143,11 @@ public class OrderServiceImpl implements IOrderService {
                 .setUndiscountableAmount(undiscountableAmount).setSellerId(sellerId).setBody(body)
                 .setOperatorId(operatorId).setStoreId(storeId).setExtendParams(extendParams)
                 .setTimeoutExpress(timeoutExpress)
-                //支付宝服务器主动通知商户服务器里指定的页面http路径,根据需要设置
+                // 支付宝服务器主动通知商户服务器里指定的页面http路径,根据需要设置
                 .setNotifyUrl(PropertiesUtil.getProperty("alipay.callback.url"))
                 .setGoodsDetailList(goodsDetailList);
 
-        Configs.init("zfbinfo.properties");
-
-        /** 使用Configs提供的默认参数
-         *  AlipayTradeService可以使用单例或者为静态成员对象，不需要反复new
-         */
-        AlipayTradeService tradeService = new AlipayTradeServiceImpl.ClientBuilder().build();
-
+        // AlipayF2FPrecreateResult 支付宝的响应，执行到这一步已经拿到支付宝的响应了
         AlipayF2FPrecreateResult result = tradeService.tradePrecreate(builder);
         switch (result.getTradeStatus()) {
             case SUCCESS:
@@ -147,14 +157,19 @@ public class OrderServiceImpl implements IOrderService {
 
                 File folder = new File(path);
                 if (!folder.exists()) {
-                    folder.setWritable(true);
-                    folder.mkdirs();
+                    if (!folder.setWritable(true)) {
+                        LOGGER.warn("设置写权限失败！");
+                    }
+                    if (!folder.mkdirs()) {
+                        LOGGER.error("创建文件夹失败!");
+                    }
                 }
 
-                // 需要修改为运行机器上的路径
-                String qrPath = String.format(path + "/qr-%s.png", response.getOutTradeNo());
-                String qrFilenName = String.format("qr-%s.png", response.getOutTradeNo());
-                // 生成二维码
+                // 将二维码上传到图片服务器中，注意：我们这里获取的真实路径path最后是没有 "/" 的，
+                String qrPath = String.format(path + "/qr-%s.png", orderNo);
+                // 二维码图片文件名称,orderNo会替换到 %s 上
+                String qrFilenName = String.format("qr-%s.png", orderNo);
+                // 将内容contents生成长宽均为width的图片，图片路径由imgPath指定
                 ZxingUtils.getQRCodeImge(response.getQrCode(), 256, qrPath);
                 File targetFile = new File(qrPath, qrFilenName);
                 try {
@@ -164,6 +179,7 @@ public class OrderServiceImpl implements IOrderService {
                 }
                 LOGGER.info("filePath:" + qrPath);
                 String qrUrl = PropertiesUtil.getProperty("ftp.server.http.prefix") + targetFile.getName();
+                // 给前端返回二维码图片地址
                 map.put("qrUrl", qrUrl);
                 return ServerResponse.createBySuccess(map);
             case FAILED:
