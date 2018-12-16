@@ -69,7 +69,8 @@ public class OrderServiceImpl implements IOrderService {
          * Configs会读取classpath下的zfbinfo.properties文件配置信息，如果找不到该文件则确认该文件是否在classpath目录
          */
         Configs.init("zfbinfo.properties");
-        tradeService = new AlipayTradeServiceImpl.ClientBuilder().build();
+        // 设置字符集
+        tradeService = new AlipayTradeServiceImpl.ClientBuilder().setCharset("utf-8").build();
     }
 
     /**
