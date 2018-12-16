@@ -165,7 +165,10 @@ public class OrderController {
     public ServerResponse queryOrderPayStatus(HttpSession session, long orderNo) {
         ServerResponse<User> response = checkLogin(session);
         if (response.isSuccess()) {
-            return iOrderService.queryOrderPayStatus(response.getData().getId(), orderNo);
+            if (iOrderService.queryOrderPayStatus(response.getData().getId(), orderNo).isSuccess()) {
+                return ServerResponse.createBySuccess(true);
+            }
+            return ServerResponse.createBySuccess(false);
         }
         return response;
     }
