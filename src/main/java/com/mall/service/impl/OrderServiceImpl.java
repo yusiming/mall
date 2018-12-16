@@ -208,10 +208,10 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     /**
-     * 验证
+     * 支付宝回调通过之后，修改订单的状态，将支付信息持久化到数据库中
      *
-     * @param params
-     * @return
+     * @param params 参数
+     * @return 响应
      */
     public ServerResponse aliCallback(Map<String, String> params) {
         // 订单号
@@ -224,6 +224,7 @@ public class OrderServiceImpl implements IOrderService {
         if (order == null) {
             return ServerResponse.createByErrorMessage("该订单不存在，回调忽略");
         }
+        // 如果该订单已经支付，则支付宝重复回调了，忽略即可
         if (order.getStatus() >= Const.OrderStatus.PAID.getCode()) {
             return ServerResponse.createBySuccessMsg("支付宝重复回调");
         }
@@ -246,6 +247,28 @@ public class OrderServiceImpl implements IOrderService {
         // 持久化到数据库中
         payInfoMapper.insert(payInfo);
         return ServerResponse.createBySuccess();
+    }
+
+    /**
+     * 校验支付宝通知数据的正确性
+     *
+     * @param map 包含了通知数据的map
+     * @return 响应
+     */
+    public ServerResponse checkTrade(Map<String, String> map) {
+        /*
+         * 1.校验out_trade_no是否为系统中创建的订单号
+         * 2.判断total_amount是否确实为该订单的实际金额
+         * 3.验通知中的seller_id（或者seller_email) 是否为out_trade_no这笔单据的对应的操作方
+         *   有的时候，一个商户可能有多个seller_id/seller_email，我们这个项目中，seller_id/seller_email就只有一个
+         */
+        if (!Configs.getPid().equals(map.get("seller_id"))) {
+            return ServerResponse.createByError();
+        }
+        if (orderMapper.selectOrderByOrderNoAndTotalAmount(map.get("out_trade_no"), map.get("total_amount")) > 0) {
+            return ServerResponse.createBySuccess();
+        }
+        return ServerResponse.createByError();
     }
 
     @Override
@@ -445,7 +468,7 @@ public class OrderServiceImpl implements IOrderService {
         }
         Order updateOrder = new Order();
         order.setId(order.getId());
-        order.setStatus(Const.OrderStatus.CANCLE.getCode());
+        order.setStatus(Const.OrderStatus.CANCEL.getCode());
         int rowCount = orderMapper.updateByPrimaryKeySelective(updateOrder);
         if (rowCount > 0) {
             return ServerResponse.createBySuccess();

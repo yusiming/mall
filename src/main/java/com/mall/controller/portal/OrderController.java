@@ -112,35 +112,40 @@ public class OrderController {
      */
     @RequestMapping("alipay_callback.do")
     @ResponseBody
-    public Object alipyCallback(HttpServletRequest request) {
+    public Object alipayCallback(HttpServletRequest request) {
+        // 获取请求所有的请求参数
         Map<String, String[]> parameterMap = request.getParameterMap();
         Map<String, String> map = Maps.newHashMap();
         for (String s : parameterMap.keySet()) {
             String valueStr = "";
             String[] values = parameterMap.get(s);
             for (int i = 0; i < values.length; i++) {
-                valueStr = (i != values.length - 1) ? valueStr + values[i] : valueStr + values[i] + ",";
+                valueStr = (i == values.length - 1) ? valueStr + values[i] : valueStr + values[i] + ",";
             }
+            // 添加到参数封装到map中
             map.put(s, valueStr);
         }
         LOGGER.info("支付宝回调,sign:{},trade_status:{},参数:{}", map.get("sign"), map.get("trade_status"), map.toString());
 
-        // 这里要移除sign_type
+        // 这里要移除sign_type，不然验签无法不通过，sign参数会被支付宝的代码移除
         map.remove("sign_type");
         try {
-            // 验证回调的正确性，验证回调到底是不是支付宝发的，而且还要避免重复通知
-            boolean alipayRSACheckV2 = AlipaySignature.rsaCheckV2(map, Configs.getAlipayPublicKey(), "utf-8", Configs
-                    .getSignType());
-            // 如果验证通过
-            if (!alipayRSACheckV2) {
-                return ServerResponse.createByErrorMessage("非法请求，验证不通过，在恶意请求我就找网警了");
+            /*
+             * 使用验签方法验证回调的正确性，而且还要避免重复通知
+             * 注意需要使用可以选择签名算法类型的验签方法，使用支付宝提供的Configs对象获取支付宝公钥和签名算法类型
+             */
+            if (!AlipaySignature.rsaCheckV2(map, Configs.getAlipayPublicKey(), "utf-8", Configs.getSignType())) {
+                // 如果验证不通过，返回警告信息
+                return ServerResponse.createByErrorMessage("非法请求，验证不通过，再恶意将移交网警处理！");
             }
         } catch (AlipayApiException e) {
             LOGGER.error("支付宝验证回调异常", e);
         }
-        // TODO: 2018/12/2 验证各种数据，比如订单号是否正确，订单总金额是否正确
+        // 内部校验通知数据的正确性，如果校验失败，忽略此次回调通知
+        if (!iOrderService.checkTrade(map).isSuccess()) {
+            return Const.AlipayCallback.RESPONSE_FAILED;
+        }
 
-        //
         ServerResponse serverResponse = iOrderService.aliCallback(map);
         if (serverResponse.isSuccess()) {
             return Const.AlipayCallback.RESPONSE_SUCCESS;

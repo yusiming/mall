@@ -19,7 +19,21 @@ public interface IOrderService {
      */
     ServerResponse pay(Integer userId, long orderNo, String path);
 
+    /**
+     * 支付宝回调通过之后，修改订单的状态，将支付信息持久化到数据库中
+     *
+     * @param params 参数
+     * @return 如果成功，返回正确的响应，如果失败返回错误的响应
+     */
     ServerResponse aliCallback(Map<String, String> params);
+
+    /**
+     * 校验支付宝通知数据的正确性
+     *
+     * @param map 包含了通知数据的map
+     * @return 如果校验通过，返回成功的响应，否则返回错误的响应
+     */
+    ServerResponse checkTrade(Map<String, String> map);
 
     ServerResponse queryOrderPayStatus(Integer userId, long orderNo);
 
