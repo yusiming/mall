@@ -271,6 +271,13 @@ public class OrderServiceImpl implements IOrderService {
         return ServerResponse.createByError();
     }
 
+    /**
+     * 查询订单支付状态，是否已经支付
+     *
+     * @param userId  用户id
+     * @param orderNo 订单号
+     * @return 响应
+     */
     @Override
     public ServerResponse queryOrderPayStatus(Integer userId, long orderNo) {
         Order order = orderMapper.selectOrderByUserIdAndOrderNo(userId, orderNo);

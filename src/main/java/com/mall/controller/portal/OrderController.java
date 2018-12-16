@@ -154,21 +154,20 @@ public class OrderController {
     }
 
     /**
-     * 查询订单支付状态
+     * 查询订单支付状态，订单知否已经支付成功
      *
-     * @param session
-     * @param orderNo
-     * @return
+     * @param session session
+     * @param orderNo 订单号
+     * @return 响应
      */
     @RequestMapping("query_order_pay_status.do")
     @ResponseBody
     public ServerResponse queryOrderPayStatus(HttpSession session, long orderNo) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
-        if (user != null) {
-            return iOrderService.queryOrderPayStatus(user.getId(), orderNo);
+        ServerResponse<User> response = checkLogin(session);
+        if (response.isSuccess()) {
+            return iOrderService.queryOrderPayStatus(response.getData().getId(), orderNo);
         }
-        return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
-                ResponseCode.NEED_LOGIN.getDesc());
+        return response;
     }
 
     /**

@@ -35,6 +35,13 @@ public interface IOrderService {
      */
     ServerResponse checkTrade(Map<String, String> map);
 
+    /**
+     * 根据用户id和订单号查询订单支付状态
+     *
+     * @param userId  用户id
+     * @param orderNo 订单号
+     * @return 如果订单支付成功，返回成功的响应，否则返回错误的响应
+     */
     ServerResponse queryOrderPayStatus(Integer userId, long orderNo);
 
     ServerResponse createOrder(Integer userId, Integer shippingId);
