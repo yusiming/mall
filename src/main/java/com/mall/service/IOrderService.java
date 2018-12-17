@@ -106,6 +106,14 @@ public interface IOrderService {
      */
     ServerResponse manageDetail(long orderNo);
 
+    /**
+     * 管理员搜索订单
+     *
+     * @param orderNo  订单号
+     * @param pageNum  第几页
+     * @param pageSize 每页几条记录
+     * @return 响应
+     */
     ServerResponse manageSearch(long orderNo, int pageNum, int pageSize);
 
     ServerResponse manageSendGoods(long orderNo);

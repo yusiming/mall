@@ -75,17 +75,25 @@ public class OrderManageController {
         return response;
     }
 
+    /**
+     * 管理员搜索订单
+     *
+     * @param session  session
+     * @param orderNo  订单号
+     * @param pageNum  第几页
+     * @param pageSize 每页几条数据
+     * @return 响应
+     */
     @RequestMapping("search.do")
     @ResponseBody
     public ServerResponse orderSearch(HttpSession session, long orderNo,
                                       @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
                                       @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
-        if (user != null) {
+        ServerResponse response = checkAdmin(session);
+        if (response.isSuccess()) {
             return iOrderService.manageSearch(orderNo, pageNum, pageSize);
         }
-        return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
-                ResponseCode.NEED_LOGIN.getDesc());
+        return response;
     }
 
     /**
