@@ -98,6 +98,12 @@ public interface IOrderService {
      */
     ServerResponse manageList(int pageNum, int pageSize);
 
+    /**
+     * 管理员获取订单详细信息
+     *
+     * @param orderNo 订单编号
+     * @return 响应
+     */
     ServerResponse manageDetail(long orderNo);
 
     ServerResponse manageSearch(long orderNo, int pageNum, int pageSize);

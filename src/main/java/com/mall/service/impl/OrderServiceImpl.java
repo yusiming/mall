@@ -653,6 +653,12 @@ public class OrderServiceImpl implements IOrderService {
         return ServerResponse.createBySuccess(pageResult);
     }
 
+    /**
+     * 管理员查询订单详细信息
+     *
+     * @param orderNo 订单编号
+     * @return 响应
+     */
     public ServerResponse manageDetail(long orderNo) {
         Order order = orderMapper.selectByOrderNo(orderNo);
         if (order == null) {

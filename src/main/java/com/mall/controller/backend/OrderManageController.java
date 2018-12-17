@@ -68,12 +68,11 @@ public class OrderManageController {
     @RequestMapping("detail.do")
     @ResponseBody
     public ServerResponse orderDetail(HttpSession session, long orderNo) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
-        if (user != null) {
+        ServerResponse response = checkAdmin(session);
+        if (response.isSuccess()) {
             return iOrderService.manageDetail(orderNo);
         }
-        return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
-                ResponseCode.NEED_LOGIN.getDesc());
+        return response;
     }
 
     @RequestMapping("search.do")
