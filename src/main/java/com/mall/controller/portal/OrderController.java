@@ -53,21 +53,20 @@ public class OrderController {
     }
 
     /**
-     * 取消订单
+     * 用户取消订单
      *
-     * @param session
-     * @param orderNo
-     * @return
+     * @param session session域
+     * @param orderNo 订单编号
+     * @return 响应
      */
     @RequestMapping("cancel.do")
     @ResponseBody
     public ServerResponse cancel(HttpSession session, long orderNo) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
-        if (user != null) {
-            return iOrderService.cancel(user.getId(), orderNo);
+        ServerResponse<User> response = checkLogin(session);
+        if (response.isSuccess()) {
+            return iOrderService.cancel(response.getData().getId(), orderNo);
         }
-        return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
-                ResponseCode.NEED_LOGIN.getDesc());
+        return response;
     }
 
     /**

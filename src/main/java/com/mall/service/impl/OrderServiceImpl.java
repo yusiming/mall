@@ -523,17 +523,19 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     /**
-     * 取消用户订单
+     * 取消订单
      *
-     * @param userId
-     * @param orderNO
-     * @return
+     * @param userId  用户id
+     * @param orderNO 订单编号
+     * @return 响应
      */
     public ServerResponse cancel(Integer userId, long orderNO) {
+        // 校验订单是否存在
         Order order = orderMapper.selectOrderByUserIdAndOrderNo(userId, orderNO);
         if (order == null) {
             return ServerResponse.createByErrorMessage("订单不存在");
         }
+        // 这里简单的判断如果已支付就不能取消订单了
         if (order.getStatus() != Const.OrderStatus.NO_PAY.getCode()) {
             // 这里是一个问题，可以通过对接支付宝的退款，完成用户的退款
             return ServerResponse.createByErrorMessage("已付款，无法取消订单");

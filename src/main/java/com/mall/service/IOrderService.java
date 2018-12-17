@@ -53,6 +53,13 @@ public interface IOrderService {
      */
     ServerResponse createOrder(Integer userId, Integer shippingId);
 
+    /**
+     * 根据用户id和订单编号取消订单
+     *
+     * @param userId  用户id
+     * @param orderNO 订单编号
+     * @return 如果取消成功，返回正确的提示信息，否则返回错误的提示信息
+     */
     ServerResponse cancel(Integer userId, long orderNO);
 
     ServerResponse getOrderCartProduct(Integer userId);
