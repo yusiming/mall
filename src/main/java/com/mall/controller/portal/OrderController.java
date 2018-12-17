@@ -209,23 +209,6 @@ public class OrderController {
     }
 
     /**
-     * 订单发货
-     *
-     * @param session session域
-     * @param orderNo 订单号
-     */
-    @RequestMapping("send_goods.do")
-    @ResponseBody
-    public ServerResponse sendGoods(HttpSession session, long orderNo) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
-        if (user != null) {
-            return iOrderService.manageSendGoods(orderNo);
-        }
-        return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
-                ResponseCode.NEED_LOGIN.getDesc());
-    }
-
-    /**
      * 校验用户是否已登陆
      *
      * @param session session域
