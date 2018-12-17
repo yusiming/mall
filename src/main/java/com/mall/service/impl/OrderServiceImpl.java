@@ -543,6 +543,7 @@ public class OrderServiceImpl implements IOrderService {
         Order updateOrder = new Order();
         order.setId(order.getId());
         order.setStatus(Const.OrderStatus.CANCEL.getCode());
+        order.setUpdateTime(new Date());
         int rowCount = orderMapper.updateByPrimaryKeySelective(updateOrder);
         if (rowCount > 0) {
             return ServerResponse.createBySuccess();

@@ -205,9 +205,6 @@
             <if test="closeTime != null">
                 close_time = #{closeTime,jdbcType=TIMESTAMP},
             </if>
-            <if test="createTime != null">
-                create_time = #{createTime,jdbcType=TIMESTAMP},
-            </if>
             <if test="updateTime != null">
                 update_time = now(),
             </if>
