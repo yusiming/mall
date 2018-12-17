@@ -97,7 +97,7 @@ public class OrderManageController {
     }
 
     /**
-     * 订单发货
+     * 管理员订单发货
      *
      * @param session session域
      * @param orderNo 订单号
@@ -105,11 +105,10 @@ public class OrderManageController {
     @RequestMapping("send_goods.do")
     @ResponseBody
     public ServerResponse sendGoods(HttpSession session, long orderNo) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
-        if (user != null) {
+        ServerResponse response = checkAdmin(session);
+        if (response.isSuccess()) {
             return iOrderService.manageSendGoods(orderNo);
         }
-        return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
-                ResponseCode.NEED_LOGIN.getDesc());
+        return response;
     }
 }

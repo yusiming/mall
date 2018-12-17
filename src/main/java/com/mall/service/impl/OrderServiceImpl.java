@@ -195,7 +195,11 @@ public class OrderServiceImpl implements IOrderService {
         }
     }
 
-    // 简单打印应答
+    /**
+     * 支付宝预下单成功之后，记录订单信息
+     *
+     * @param response AlipayResponse
+     */
     private void dumpResponse(AlipayResponse response) {
         if (response != null) {
             LOGGER.info(String.format("code:%s, msg:%s", response.getCode(), response.getMsg()));
@@ -689,9 +693,16 @@ public class OrderServiceImpl implements IOrderService {
         return ServerResponse.createBySuccess(result);
     }
 
+    /**
+     * 管理员订单发货
+     *
+     * @param orderNo 订单号
+     * @return 响应
+     */
     @Override
     public ServerResponse manageSendGoods(long orderNo) {
         Order order = orderMapper.selectByOrderNo(orderNo);
+        // 如果订单已付款才能发货
         if (order != null && order.getStatus() == Const.OrderStatus.PAID.getCode()) {
             Order updateOrder = new Order();
             updateOrder.setId(order.getId());
