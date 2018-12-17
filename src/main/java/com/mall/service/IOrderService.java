@@ -62,6 +62,12 @@ public interface IOrderService {
      */
     ServerResponse cancel(Integer userId, long orderNO);
 
+    /**
+     * 获取订单信息，订单确认时需要使用
+     *
+     * @param userId 用户id
+     * @return 响应
+     */
     ServerResponse getOrderCartProduct(Integer userId);
 
     ServerResponse getOrderDetail(Integer userId, long orderNo);

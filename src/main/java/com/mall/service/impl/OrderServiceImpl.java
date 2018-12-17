@@ -551,14 +551,20 @@ public class OrderServiceImpl implements IOrderService {
         return ServerResponse.createByError();
     }
 
+    /**
+     * 获取订单信息，订单确认时需要使用
+     *
+     * @param userId 用户id
+     * @return 响应
+     */
     public ServerResponse getOrderCartProduct(Integer userId) {
         OrderProductVo orderProductVo = new OrderProductVo();
         List<Cart> cartList = cartMapper.selectByUserId(userId);
-        ServerResponse response = getCartOrderItemList(userId, cartList);
+        ServerResponse<List<OrderItem>> response = getCartOrderItemList(userId, cartList);
         if (!response.isSuccess()) {
             return response;
         }
-        List<OrderItem> orderItemList = (List<OrderItem>) response.getData();
+        List<OrderItem> orderItemList = response.getData();
         List<OrderItemVo> orderItemVoList = Lists.newArrayList();
         BigDecimal payment = new BigDecimal("0");
         for (OrderItem orderItem : orderItemList) {

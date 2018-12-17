@@ -70,20 +70,19 @@ public class OrderController {
     }
 
     /**
-     * 获取购物车中商品信息
+     * 生成订单之前获取订单的信息（购物车中已勾选的商品所生成的信息），给用户展示，确认订单
      *
-     * @param session
-     * @return
+     * @param session session域
+     * @return 响应
      */
     @RequestMapping("get_order_cart_product.do")
     @ResponseBody
     public ServerResponse getOrderCartProduct(HttpSession session) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
-        if (user != null) {
-            return iOrderService.getOrderCartProduct(user.getId());
+        ServerResponse<User> response = checkLogin(session);
+        if (response.isSuccess()) {
+            return iOrderService.getOrderCartProduct(response.getData().getId());
         }
-        return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
-                ResponseCode.NEED_LOGIN.getDesc());
+        return response;
     }
 
     /**
