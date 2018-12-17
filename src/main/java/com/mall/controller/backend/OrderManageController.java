@@ -18,10 +18,27 @@ import javax.servlet.http.HttpSession;
  * @Date 2018/12/5 21:50
  */
 @Controller
-@RequestMapping("manage/order/")
+@RequestMapping("/manage/order/")
 public class OrderManageController {
     @Autowired
     private IOrderService iOrderService;
+
+    /**
+     * 校验用户是否为管理员
+     *
+     * @param session session域
+     * @return 如果用户未登陆或者不是管理员，返回错误的响应，否则返回成功的响应
+     */
+    private ServerResponse checkAdmin(HttpSession session) {
+        User user = (User) session.getAttribute(Const.CURRENT_USER);
+        if (user == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
+                    ResponseCode.NEED_LOGIN.getDesc());
+        } else if (user.getRole() != Const.Role.ROLE_ADMIN) {
+            return ServerResponse.createByErrorMessage("您不是管理员，请勿随意登陆，否则我们将封禁您的IP!");
+        }
+        return ServerResponse.createBySuccess();
+    }
 
     /**
      * 管理员查看订单列表
@@ -35,12 +52,11 @@ public class OrderManageController {
     public ServerResponse orderList(HttpSession session,
                                     @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
                                     @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
-        if (user != null) {
+        ServerResponse response = checkAdmin(session);
+        if (response.isSuccess()) {
             return iOrderService.manageList(pageNum, pageSize);
         }
-        return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
-                ResponseCode.NEED_LOGIN.getDesc());
+        return response;
     }
 
     /**

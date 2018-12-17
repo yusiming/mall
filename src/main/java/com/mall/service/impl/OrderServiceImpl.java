@@ -636,10 +636,17 @@ public class OrderServiceImpl implements IOrderService {
         return orderVoList;
     }
 
-    // 后台管理模块
+    /**
+     * 管理员获取订单列表
+     *
+     * @param pageNum  第几页
+     * @param pageSize 每页几条数据
+     * @return 响应
+     */
     public ServerResponse manageList(int pageNum, int pageSize) {
         PageHelper.startPage(pageNum, pageSize);
         List<Order> orderList = orderMapper.selectAllOrder();
+        // 这里传入null，代表是管理员调用该方法
         List<OrderVo> orderVoList = assembleOrderVoList(orderList, null);
         PageInfo pageResult = new PageInfo(orderList);
         pageResult.setList(orderVoList);
