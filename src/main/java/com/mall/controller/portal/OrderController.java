@@ -179,6 +179,8 @@ public class OrderController {
      * @param orderNo 订单号
      * @return 响应
      */
+    @RequestMapping("detail.do")
+    @ResponseBody
     public ServerResponse detail(HttpSession session, long orderNo) {
         ServerResponse<User> response = checkLogin(session);
         if (response.isSuccess()) {
@@ -188,21 +190,22 @@ public class OrderController {
     }
 
     /**
-     * 查看订单列表
+     * 用户查看订单列表
      *
      * @param session  session域
      * @param pageNum  第几页
      * @param pageSize 每页数据的大小
      */
+    @RequestMapping("list.do")
+    @ResponseBody
     public ServerResponse list(HttpSession session,
                                @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
                                @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
-        if (user != null) {
-            return iOrderService.getOrderList(user.getId(), pageNum, pageSize);
+        ServerResponse<User> response = checkLogin(session);
+        if (response.isSuccess()) {
+            return iOrderService.getOrderList(response.getData().getId(), pageNum, pageSize);
         }
-        return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
-                ResponseCode.NEED_LOGIN.getDesc());
+        return response;
     }
 
     /**

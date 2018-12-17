@@ -595,6 +595,14 @@ public class OrderServiceImpl implements IOrderService {
         return ServerResponse.createByErrorMessage("该订单不存在");
     }
 
+    /**
+     * 用户获取订单列表
+     *
+     * @param userId   用户id
+     * @param pageNum  第几页
+     * @param pageSize 每页几条数据
+     * @return 响应
+     */
     @Override
     public ServerResponse getOrderList(Integer userId, int pageNum, int pageSize) {
         PageHelper.startPage(pageNum, pageSize);
@@ -605,13 +613,22 @@ public class OrderServiceImpl implements IOrderService {
         return ServerResponse.createBySuccess(pageResult);
     }
 
-    public List<OrderVo> assembleOrderVoList(List<Order> orderList, Integer userId) {
+    /**
+     * 组装List<OrderVo>
+     *
+     * @param orderList 订单list
+     * @param userId    用户id
+     * @return List<OrderVo>
+     */
+    private List<OrderVo> assembleOrderVoList(List<Order> orderList, Integer userId) {
         List<OrderVo> orderVoList = Lists.newArrayList();
         for (Order order : orderList) {
             List<OrderItem> orderItemList;
+            // 如果用户id为空，则是管理员查询订单
             if (userId == null) {
                 orderItemList = orderItemMapper.selectAllByOrderNo(order.getOrderNo());
             } else {
+                // 如果用户id存在，就是普通用户查询订单
                 orderItemList = orderItemMapper.selectAllByUserIdAndOrderNo(userId, order.getOrderNo());
             }
             orderVoList.add(assembleOrderVo(order, orderItemList));

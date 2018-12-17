@@ -79,6 +79,14 @@ public interface IOrderService {
      */
     ServerResponse getOrderDetail(Integer userId, long orderNo);
 
+    /**
+     * 根据用户id，获取该用户的订单列表
+     *
+     * @param userId   用户id
+     * @param pageNum  第几页
+     * @param pageSize 每页几条数据
+     * @return 响应
+     */
     ServerResponse getOrderList(Integer userId, int pageNum, int pageSize);
 
     ServerResponse manageList(int pageNum, int pageSize);
