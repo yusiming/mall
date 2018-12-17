@@ -577,6 +577,13 @@ public class OrderServiceImpl implements IOrderService {
         return ServerResponse.createBySuccess(orderProductVo);
     }
 
+    /**
+     * 根据用户id和订单号获取订单的详细信息
+     *
+     * @param userId  用户id
+     * @param orderNo 订单编号
+     * @return 响应
+     */
     @Override
     public ServerResponse getOrderDetail(Integer userId, long orderNo) {
         Order order = orderMapper.selectOrderByUserIdAndOrderNo(userId, orderNo);

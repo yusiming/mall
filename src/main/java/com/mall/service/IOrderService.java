@@ -70,6 +70,13 @@ public interface IOrderService {
      */
     ServerResponse getOrderCartProduct(Integer userId);
 
+    /**
+     * 根据用户id和订单号获取订单的详细信息（OrderVo）
+     *
+     * @param userId  用户id
+     * @param orderNo 订单编号
+     * @return 如果获取成功，返回包含了订单信息（OrderVO）的响应，否则返回错误的响应
+     */
     ServerResponse getOrderDetail(Integer userId, long orderNo);
 
     ServerResponse getOrderList(Integer userId, int pageNum, int pageSize);

@@ -175,17 +175,16 @@ public class OrderController {
     /**
      * 获取订单详情
      *
-     * @param session
-     * @param orderNo
-     * @return
+     * @param session session域
+     * @param orderNo 订单号
+     * @return 响应
      */
     public ServerResponse detail(HttpSession session, long orderNo) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
-        if (user != null) {
-            return iOrderService.getOrderDetail(user.getId(), orderNo);
+        ServerResponse<User> response = checkLogin(session);
+        if (response.isSuccess()) {
+            return iOrderService.getOrderDetail(response.getData().getId(), orderNo);
         }
-        return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
-                ResponseCode.NEED_LOGIN.getDesc());
+        return response;
     }
 
     /**
