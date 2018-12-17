@@ -210,4 +210,9 @@
             update_time = now()
         where id = #{id,jdbcType=INTEGER}
     </update>
+    <update id="updateProductStock">
+        update mall_product
+        set stock = stock - #{quantity}
+        where id = #{productId}
+    </update>
 </mapper>

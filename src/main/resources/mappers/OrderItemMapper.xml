@@ -175,11 +175,6 @@
             update_time        = now()
         where id = #{id,jdbcType=INTEGER}
     </update>
-    <update id="updateProductStock">
-        update mall_product
-        set stock = stock - #{quantity}
-        where id = #{productId}
-    </update>
     <insert id="batchInsert" parameterType="list">
         insert into mall_order_item (id, user_id, order_no,
         product_id, product_name, product_image,

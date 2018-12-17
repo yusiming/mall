@@ -36,6 +36,7 @@ public class OrderController {
 
     /**
      * 用户创建订单
+     * 前台只需要传递shippingId，收货地址即可，所有的其他会通过当前登陆的用户来获取
      *
      * @param session    session域
      * @param shippingId 用户收货地址信息

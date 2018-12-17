@@ -290,47 +290,69 @@ public class OrderServiceImpl implements IOrderService {
         return ServerResponse.createByError();
     }
 
+    /**
+     * 用户创建订单
+     *
+     * @param userId     用户id
+     * @param shippingId 收货地址id
+     * @return 响应
+     */
     @Override
     public ServerResponse createOrder(Integer userId, Integer shippingId) {
+        // 获取该用户购物车中所有已经选中的商品信息，用来生成订单
         List<Cart> cartList = cartMapper.selectCheckedCartByUserId(userId);
         if (CollectionUtils.isEmpty(cartList)) {
             return ServerResponse.createByErrorMessage("购物车为空");
         }
-        ServerResponse serverResponse = this.getCartOrderItems(userId, cartList);
+        ServerResponse<List<OrderItem>> serverResponse = this.getCartOrderItemList(userId, cartList);
+        // 如果创建订单明细列表失败，直接返回响应给前端展示
         if (!serverResponse.isSuccess()) {
             return serverResponse;
         }
-        List<OrderItem> orderItemList = (List<OrderItem>) serverResponse.getData();
-        BigDecimal payment = getOrderTotalPrice(orderItemList);
+        List<OrderItem> orderItemList = serverResponse.getData();
+        // 获取所有订单明细的总金额，即这个Order的金额
+        BigDecimal payment = this.getOrderTotalPrice(orderItemList);
 
         // 生成订单
         Order order = assembleOrder(userId, shippingId, payment);
         if (order == null) {
             return ServerResponse.createByErrorMessage("生成订单错误");
         }
+        // 设置订单明细的所属的订单号
         for (OrderItem orderItem : orderItemList) {
             orderItem.setOrderNo(order.getOrderNo());
         }
-        // mybatis批量插入
+        // mybatis批量插入订单明细
         orderItemMapper.batchInsert(orderItemList);
         // 订单生产成功，减少商品库存
         this.reduceProductStock(orderItemList);
         // 清空购物车
         this.cleanCart(cartList);
-        // 返回给前端数据
+        // 组装OderVo,返回给前端展示
         OrderVo orderVo = this.assembleOrderVo(order, orderItemList);
         return ServerResponse.createBySuccess(orderVo);
     }
 
-    private ServerResponse getCartOrderItems(Integer userId, List<Cart> cartList) {
+    /**
+     * 根据用户id和购物车中的数据创建订单的明细：List<OrderItem>
+     * <p>
+     * 购物车中的每一个商品对应着一个OrderItem，即一个Cart对应一个OrderItem
+     *
+     * @param userId   用户id
+     * @param cartList 购物车信息
+     * @return 如果购物车中没有添加任何商品或者商品的不在销售状态或者商品的存库不足，返回错误的提示西悉
+     * 否则返回订单明细列表List<OrderItem>
+     */
+    private ServerResponse<List<OrderItem>> getCartOrderItemList(Integer userId, List<Cart> cartList) {
         List<OrderItem> orderItemList = Lists.newArrayList();
         if (CollectionUtils.isEmpty(cartList)) {
             return ServerResponse.createByErrorMessage("购物车为空");
         }
         for (Cart cart : cartList) {
             OrderItem orderItem = new OrderItem();
+            // 根据购物车中的商品id，查询商品的详细信息，包括商品的存库
             Product product = productMapper.selectByPrimaryKey(cart.getProductId());
-            // 校验商品数量
+            // 拿到商品信息之后，校验商品的销售状态
             if (Const.ProductStatus.ON_SALE.getCode() != product.getStatus()) {
                 return ServerResponse.createByErrorMessage("商品" + product.getName() + "非在线售卖状态");
             }
@@ -342,14 +364,22 @@ public class OrderServiceImpl implements IOrderService {
             orderItem.setProductId(product.getId());
             orderItem.setProductName(product.getName());
             orderItem.setProductImage(product.getMainImage());
+            // 这里一定要记录当前的商品单价
             orderItem.setCurrentUnitPrice(product.getPrice());
             orderItem.setQuantity(cart.getQuantity());
+            // 该订单明细的总金额
             orderItem.setTotalPrice(BigDecimalUtil.mul(product.getPrice().doubleValue(), cart.getQuantity()));
             orderItemList.add(orderItem);
         }
         return ServerResponse.createBySuccess(orderItemList);
     }
 
+    /**
+     * 根据订单明细，获取订单的总金额
+     *
+     * @param orderItemList 订单明细list
+     * @return 总金额
+     */
     private BigDecimal getOrderTotalPrice(List<OrderItem> orderItemList) {
         BigDecimal payment = new BigDecimal("0");
         for (OrderItem orderItem : orderItemList) {
@@ -358,10 +388,20 @@ public class OrderServiceImpl implements IOrderService {
         return payment;
     }
 
+    /**
+     * 根据用户id，用户收货地址id，订单总金额，组装Order对象
+     *
+     * @param userId     用户id
+     * @param shippingId 用户收货地址id
+     * @param payment    订单总金额
+     * @return 订单对象Order
+     */
     private Order assembleOrder(Integer userId, Integer shippingId, BigDecimal payment) {
         Order order = new Order();
         order.setOrderNo(this.generateOrderNo());
+        // 此时的订单状态为未支付
         order.setStatus(Const.OrderStatus.NO_PAY.getCode());
+        // 运费这里就设置为0
         order.setPostage(0);
         order.setPaymentType(Const.PaymentType.ONLINE_PAY.getCode());
         order.setPayment(payment);
@@ -377,7 +417,7 @@ public class OrderServiceImpl implements IOrderService {
     /**
      * 生成订单号
      *
-     * @return
+     * @return 订单号
      */
     private long generateOrderNo() {
         long currentTime = System.currentTimeMillis();
@@ -385,23 +425,35 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     /**
-     * 减少商品库存
+     * 订单生成成功之后，减少商品库存
      *
-     * @param orderItemList
+     * @param orderItemList 订单明细list
      */
     private void reduceProductStock(List<OrderItem> orderItemList) {
         for (OrderItem orderItem : orderItemList) {
-            orderItemMapper.updateProductStock(orderItem.getProductId(), orderItem.getQuantity());
+            productMapper.updateProductStock(orderItem.getProductId(), orderItem.getQuantity());
         }
     }
 
+    /**
+     * 订单生成之后清空用户的购物车
+     *
+     * @param cartList 购物车信息
+     */
     private void cleanCart(List<Cart> cartList) {
         for (Cart cart : cartList) {
-            // 删除该条记录
+            // 直接删除该条记录
             cartMapper.deleteByPrimaryKey(cart.getId());
         }
     }
 
+    /**
+     * 组装OrderVo
+     *
+     * @param order         订单
+     * @param orderItemList 订单明细list
+     * @return OrderVo
+     */
     private OrderVo assembleOrderVo(Order order, List<OrderItem> orderItemList) {
         OrderVo ordervo = new OrderVo();
         ordervo.setOrderNo(order.getOrderNo());
@@ -409,6 +461,7 @@ public class OrderServiceImpl implements IOrderService {
         ordervo.setPaymentType(order.getPaymentType());
         ordervo.setPaymentTypeDesc(Const.PaymentType.getDesc(order.getPaymentType()));
         ordervo.setPostage(order.getPostage());
+        // 设置订单的状态
         ordervo.setStatus(order.getStatus());
         ordervo.setStatusDesc(Const.OrderStatus.getDesc(order.getStatus()));
         order.setShippingId(order.getShippingId());
@@ -431,6 +484,12 @@ public class OrderServiceImpl implements IOrderService {
         return ordervo;
     }
 
+    /**
+     * 组装ShippingVo
+     *
+     * @param shipping Shipping对象
+     * @return ShippingVo
+     */
     private ShippingVo assembleShippingVo(Shipping shipping) {
         ShippingVo shippingVo = new ShippingVo();
         shippingVo.setReceiverName(shipping.getReceiverName());
@@ -444,6 +503,12 @@ public class OrderServiceImpl implements IOrderService {
         return shippingVo;
     }
 
+    /**
+     * 组装OrderItemVo
+     *
+     * @param orderItem orderItem
+     * @return OrderItemVo
+     */
     private OrderItemVo assembleOrderItemVo(OrderItem orderItem) {
         OrderItemVo orderItemVo = new OrderItemVo();
         orderItemVo.setOrderNo(orderItem.getOrderNo());
@@ -486,7 +551,7 @@ public class OrderServiceImpl implements IOrderService {
     public ServerResponse getOrderCartProduct(Integer userId) {
         OrderProductVo orderProductVo = new OrderProductVo();
         List<Cart> cartList = cartMapper.selectByUserId(userId);
-        ServerResponse response = getCartOrderItems(userId, cartList);
+        ServerResponse response = getCartOrderItemList(userId, cartList);
         if (!response.isSuccess()) {
             return response;
         }

@@ -11,10 +11,16 @@ import java.util.Set;
  * @Date 2018/11/22 22:37
  */
 public class Const {
+    /**
+     * session中表示当前用户的key
+     */
     public static final String CURRENT_USER = "currentUser";
     public static final String USERNAME = "username";
     public static final String EMAIL = "email";
 
+    /**
+     * 用户身份
+     */
     public interface Role {
         //普通用户
         int ROLE_CUSTOMER = 0;
@@ -22,6 +28,9 @@ public class Const {
         int ROLE_ADMIN = 1;
     }
 
+    /**
+     * 商品销售状态枚举类
+     */
     public enum ProductStatus {
         ON_SALE("在售", 1),;
         private String value;
@@ -41,10 +50,16 @@ public class Const {
         }
     }
 
+    /**
+     * 查询商品的排序方式
+     */
     public interface ProductListOrderBy {
         Set<String> PRICE_ASC_DESC = Sets.newHashSet("price_asc", "price_desc");
     }
 
+    /**
+     * 购物车中商品的勾选状态
+     */
     public interface Cart {
         int UN_CHECKED = 0; // 购物车中未选中状态
         int CHECKED = 1; // 购物车中已选中状态
@@ -53,6 +68,9 @@ public class Const {
         String LIMIT_NUM_SUCCESS = "LIMIT_NUM_SUCCESS";
     }
 
+    /**
+     * 订单的状态枚举类
+     */
     public enum OrderStatus {
         CANCEL(0, "已取消"),
         NO_PAY(10, "未支付"),
@@ -95,6 +113,9 @@ public class Const {
         }
     }
 
+    /**
+     * 支付宝回调状态有关常量
+     */
     public interface AlipayCallback {
         String TRADE_STATUS_WAIT_BUYER_PAY = "WAIT_BUYER_PAY";
         String TRADE_STATUS_TRADE_SUCCESS = "TRADE_SUCCESS";
@@ -103,6 +124,9 @@ public class Const {
         String RESPONSE_FAILED = "failed";
     }
 
+    /**
+     * 支付的平台枚举类
+     */
     public enum PayPlatform {
         ALIPAY(1, "支付宝");
         private String value;
@@ -130,6 +154,9 @@ public class Const {
         }
     }
 
+    /**
+     * 支付方式枚举类
+     */
     public enum PaymentType {
         ONLINE_PAY(1, "在线支付");
 

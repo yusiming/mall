@@ -22,7 +22,5 @@ public interface OrderItemMapper {
 
     void batchInsert(@Param("orderItemList") List<OrderItem> orderItemList);
 
-    void updateProductStock(@Param("productId") Integer productId, @Param("quantity") Integer quantity);
-
     List<OrderItem> selectAllByOrderNo(Long orderNo);
 }

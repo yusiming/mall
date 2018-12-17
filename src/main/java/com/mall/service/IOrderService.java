@@ -44,6 +44,13 @@ public interface IOrderService {
      */
     ServerResponse queryOrderPayStatus(Integer userId, long orderNo);
 
+    /**
+     * 通过用户id和收货地址id创建订单
+     *
+     * @param userId     用户id
+     * @param shippingId 收货地址id
+     * @return 如果创建成功，给前台返回包含了OrderVo的响应，否则返回错误的响应
+     */
     ServerResponse createOrder(Integer userId, Integer shippingId);
 
     ServerResponse cancel(Integer userId, long orderNO);
