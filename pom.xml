@@ -92,7 +92,7 @@
       <groupId>commons-dbcp</groupId>
       <artifactId>commons-dbcp</artifactId>
       <version>1.4</version>
-      <!--<scope>runtime</scope>-->
+      <scope>runtime</scope>
     </dependency>
 
 
@@ -140,7 +140,7 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.12</version>
-      <!--<scope>test</scope>-->
+      <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -158,7 +158,7 @@
     </dependency>
 
 
-    <!-- ftpclient -->
+    <!-- ftpclient，使用连接ftp服务器 -->
     <dependency>
       <groupId>commons-net</groupId>
       <artifactId>commons-net</artifactId>
@@ -180,9 +180,7 @@
       <version>2.0.1</version>
     </dependency>
 
-
-    <!-- mybatis pager -->
-
+    <!-- mybatis分页插件jar包 -->
     <dependency>
       <groupId>com.github.pagehelper</groupId>
       <artifactId>pagehelper</artifactId>
@@ -202,7 +200,7 @@
     </dependency>
 
 
-    <!-- alipay -->
+    <!-- 支付宝集成有关jar包 -->
     <dependency>
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
@@ -251,7 +249,7 @@
   <build>
     <finalName>mall</finalName>
     <plugins>
-
+      <!--添加mybatis的逆向工程插件-->
       <plugin>
         <groupId>org.mybatis.generator</groupId>
         <artifactId>mybatis-generator-maven-plugin</artifactId>
@@ -262,7 +260,7 @@
           <overwrite>true</overwrite>
         </configuration>
       </plugin>
-      <!-- geelynote maven的核心插件之-complier插件默认只支持编译Java 1.4，因此需要加上支持高版本jre的配置，在pom.xml里面加上 增加编译插件 -->
+      <!-- maven的核心插件之-complier插件默认只支持编译Java 1.4，因此需要加上支持高版本jre的配置，在pom.xml里面加上 增加编译插件 -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -270,15 +268,12 @@
           <source>1.8</source>
           <target>1.8</target>
           <encoding>UTF-8</encoding>
-          <!--将本地jar包引入lib目录下-->
+          <!--将本地jar包引入lib目录下，这一步非常重要，不然支付宝的jar包无法被打包-->
           <compilerArguments>
             <extdirs>${project.basedir}/src/main/webapp/WEB-INF/lib</extdirs>
           </compilerArguments>
         </configuration>
       </plugin>
     </plugins>
-
   </build>
-
-
 </project>
