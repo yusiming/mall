@@ -22,8 +22,8 @@ import javax.servlet.http.HttpSession;
 import java.util.Map;
 
 /**
- * @Auther yusiming
- * @Date 2018/12/2 19:00
+ * @author yusiming
+ * @date 2018/12/2 19:00
  */
 @Controller
 @RequestMapping("/order/")

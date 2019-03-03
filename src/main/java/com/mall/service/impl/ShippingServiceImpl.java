@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @Auther yusiming
- * @Date 2018/11/30 19:18
+ * @author yusiming
+ * @date 2018/11/30 19:18
  */
 @Service("iShippingService")
 public class ShippingServiceImpl implements IShippingService {

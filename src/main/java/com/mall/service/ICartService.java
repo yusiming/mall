@@ -3,8 +3,8 @@ package com.mall.service;
 import com.mall.common.ServerResponse;
 
 /**
- * @Auther yusiming
- * @Date 2018/11/29 19:22
+ * @author yusiming
+ * @date 2018/11/29 19:22
  */
 public interface ICartService {
     /**

@@ -20,8 +20,8 @@ import java.util.Set;
 /**
  * 商品分类服务
  *
- * @Auther yusiming
- * @Date 2018/11/25 10:35
+ * @author yusiming
+ * @date 2018/11/25 10:35
  */
 @Service("iCategoryService")
 public class CategoryServiceImpl implements ICategoryService {

@@ -4,8 +4,8 @@ import com.mall.common.ServerResponse;
 import com.mall.pojo.Shipping;
 
 /**
- * @Auther yusiming
- * @Date 2018/11/30 19:17
+ * @author yusiming
+ * @date 2018/11/30 19:17
  */
 public interface IShippingService {
     /**

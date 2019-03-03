@@ -6,8 +6,8 @@ import java.util.List;
 /**
  * OrderProductVo用来生成订单之前展示订单信息
  *
- * @Auther yusiming
- * @Date 2018/12/4 22:17
+ * @author yusiming
+ * @date 2018/12/4 22:17
  */
 public class OrderProductVo {
     private List<OrderItemVo> orderItemVoList;

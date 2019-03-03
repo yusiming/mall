@@ -6,8 +6,8 @@ import com.mall.pojo.Category;
 import java.util.List;
 
 /**
- * @Auther yusiming
- * @Date 2018/11/25 10:34
+ * @author yusiming
+ * @date 2018/11/25 10:34
  */
 public interface ICategoryService {
     /**

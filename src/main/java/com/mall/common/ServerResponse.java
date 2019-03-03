@@ -8,8 +8,8 @@ import java.io.Serializable;
 /**
  * 通用返回对象
  *
- * @Auther yusiming
- * @Date 2018/11/22 21:38
+ * @author yusiming
+ * @date 2018/11/22 21:38
  */
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 // 使用JsonSerialize注解保证序列化json的时候的时候，如果某个属性为null，就不将其序列化

@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpSession;
 
 /**
- * @Auther yusiming
- * @Date 2018/12/5 21:50
+ * @author yusiming
+ * @date 2018/12/5 21:50
  */
 @Controller
 @RequestMapping("/manage/order/")

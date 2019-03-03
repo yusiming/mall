@@ -16,8 +16,8 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 
 /**
- * @Auther yusiming
- * @Date 2018/12/30 10:59
+ * @author yusiming
+ * @date 2018/12/30 10:59
  */
 public class JsonUtil {
     private static Logger logger = LoggerFactory.getLogger(JsonUtil.class);

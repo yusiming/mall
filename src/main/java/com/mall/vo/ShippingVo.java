@@ -3,8 +3,8 @@ package com.mall.vo;
 /**
  * 用户收货地址Vo，包含收货人，固定电话，移动电话，省份，城市，区，详细地址，邮编
  *
- * @Auther yusiming
- * @Date 2018/12/3 21:31
+ * @author yusiming
+ * @date 2018/12/3 21:31
  */
 public class ShippingVo {
     private String receiverName;

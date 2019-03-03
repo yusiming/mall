@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 /**
  * 前台商品接口
  *
- * @Auther yusiming
- * @Date 2018/11/26 21:25
+ * @author yusiming
+ * @date 2018/11/26 21:25
  */
 @Controller()
 @RequestMapping("/product/")

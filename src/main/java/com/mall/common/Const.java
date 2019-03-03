@@ -7,8 +7,8 @@ import java.util.Set;
 /**
  * 常量类
  *
- * @Auther yusiming
- * @Date 2018/11/22 22:37
+ * @author yusiming
+ * @date 2018/11/22 22:37
  */
 public class Const {
     /**
@@ -194,4 +194,8 @@ public class Const {
         }
     }
 
+    public interface RedisPoolCache {
+        // session数据的过期时间
+        int REDIS_SESSION_EXTIME = 60 * 30;
+    }
 }

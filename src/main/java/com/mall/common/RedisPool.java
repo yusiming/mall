@@ -8,8 +8,8 @@ import redis.clients.jedis.JedisPoolConfig;
 /**
  * Redis连接池
  *
- * @Auther yusiming
- * @Date 2018/12/26 15:30
+ * @author yusiming
+ * @date 2018/12/26 15:30
  */
 public class RedisPool {
     // jedis连接池

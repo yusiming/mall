@@ -8,8 +8,8 @@ import redis.clients.jedis.Jedis;
 /**
  * Redis连接池工具，可以对Redis进行增删改查，还可以设置key的有效期
  *
- * @Auther yusiming
- * @Date 2018/12/27 09:59
+ * @author yusiming
+ * @date 2018/12/27 09:59
  */
 public class RedisPoolUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(RedisPoolUtil.class);

@@ -5,8 +5,8 @@ import com.mall.common.ServerResponse;
 import java.util.Map;
 
 /**
- * @Auther yusiming
- * @Date 2018/12/2 19:04
+ * @author yusiming
+ * @date 2018/12/2 19:04
  */
 public interface IOrderService {
     /**

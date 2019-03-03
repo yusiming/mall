@@ -5,6 +5,8 @@ import com.mall.common.ResponseCode;
 import com.mall.common.ServerResponse;
 import com.mall.pojo.User;
 import com.mall.service.IUserService;
+import com.mall.util.JsonUtil;
+import com.mall.util.RedisPoolUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,8 +18,8 @@ import javax.servlet.http.HttpSession;
 /**
  * 前台用户接口
  *
- * @Auther yusiming
- * @Date 2018/11/22 21:27
+ * @author yusiming
+ * @date 2018/11/22 21:27
  */
 @Controller
 @RequestMapping("/user/")
@@ -38,7 +40,10 @@ public class UserController {
     public ServerResponse login(HttpSession session, String username, String password) {
         ServerResponse response = iUserService.login(username, password);
         if (response.isSuccess()) {
-            session.setAttribute(Const.CURRENT_USER, response.getData());
+            // session.setAttribute(Const.CURRENT_USER, response.getData());
+            // 这里将用户的登陆信息保存到redis中，而不再保存到session域中了
+            RedisPoolUtil.setEx(session.getId(), JsonUtil.objToString(response.getData()), Const.RedisPoolCache
+                    .REDIS_SESSION_EXTIME);
         }
         // 无论是否登陆成功，都返回response，如果成功，前台拿到信息可以显示到页面上，如果登陆失败，显示错误信息
         return response;

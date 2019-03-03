@@ -3,8 +3,8 @@ package com.mall.vo;
 import java.math.BigDecimal;
 
 /**
- * @Auther yusiming
- * @Date 2018/11/25 19:44
+ * @author yusiming
+ * @date 2018/11/25 19:44
  */
 public class ProductDetailVo {
     private Integer id;
