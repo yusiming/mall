@@ -15,8 +15,8 @@ import javax.servlet.http.HttpSession;
 /**
  * 前台购物车接口
  *
- * @Auther yusiming
- * @Date 2018/11/29 19:17
+ * @author yusiming
+ * @date 2018/11/29 19:17
  */
 @Controller
 @RequestMapping("/cart/")

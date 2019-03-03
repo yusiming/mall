@@ -13,8 +13,8 @@ import java.io.IOException;
 import java.util.UUID;
 
 /**
- * @Auther yusiming
- * @Date 2018/11/25 21:30
+ * @author yusiming
+ * @date 2018/11/25 21:30
  */
 @Service("iFileService")
 public class FileServiceImpl implements IFileService {

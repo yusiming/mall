@@ -6,8 +6,8 @@ import com.mall.pojo.Product;
 import com.mall.vo.ProductDetailVo;
 
 /**
- * @Auther yusiming
- * @Date 2018/11/25 19:05
+ * @author yusiming
+ * @date 2018/11/25 19:05
  */
 public interface IProductService {
     /**

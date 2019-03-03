@@ -10,8 +10,8 @@ import java.util.Date;
 /**
  * 使用joda-time完成时间日期的转化
  *
- * @Auther yusiming
- * @Date 2018/11/25 20:15
+ * @author yusiming
+ * @date 2018/11/25 20:15
  */
 public class DateTimeUtil {
     public static final String STANDARD_FORMAT = "yyyy-MM-dd HH:mm:ss";

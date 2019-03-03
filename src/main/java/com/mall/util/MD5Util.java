@@ -3,8 +3,8 @@ package com.mall.util;
 import java.security.MessageDigest;
 
 /**
- * @Auther yusiming
- * @Date 2018/11/22 21:37
+ * @author yusiming
+ * @date 2018/11/22 21:37
  */
 public class MD5Util {
 

@@ -5,8 +5,8 @@ import org.junit.Test;
 import java.math.BigDecimal;
 
 /**
- * @Auther yusiming
- * @Date 2018/11/29 19:52
+ * @author yusiming
+ * @date 2018/11/29 19:52
  */
 public class BigDecimalTest {
     @Test

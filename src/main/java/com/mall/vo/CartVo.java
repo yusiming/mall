@@ -6,8 +6,8 @@ import java.util.List;
 /**
  * 购物车对应的抽象对象
  *
- * @Auther yusiming
- * @Date 2018/11/29 19:44
+ * @author yusiming
+ * @date 2018/11/29 19:44
  */
 public class CartVo {
     private List<CartProductVo> cartProductVoList;

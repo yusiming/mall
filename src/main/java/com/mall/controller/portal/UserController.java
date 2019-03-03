@@ -16,8 +16,8 @@ import javax.servlet.http.HttpSession;
 /**
  * 前台用户接口
  *
- * @Auther yusiming
- * @Date 2018/11/22 21:27
+ * @author yusiming
+ * @date 2018/11/22 21:27
  */
 @Controller
 @RequestMapping("/user/")

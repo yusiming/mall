@@ -15,8 +15,8 @@ import java.util.Date;
 import java.util.UUID;
 
 /**
- * @Auther yusiming
- * @Date 2018/11/22 21:37
+ * @author yusiming
+ * @date 2018/11/22 21:37
  */
 @Service("iUserService")
 public class UserServiceImpl implements IUserService {
