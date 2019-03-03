@@ -8,8 +8,8 @@ import java.util.List;
  * 订单号，订单创建时间，订单的总价，订单的支付方式，支付方式的描述，邮费，
  * 订单的状态，状态的描述信息，订单支付时间，发货时间，订单结束时间，订单关闭时间，订单明细
  *
- * @Auther yusiming
- * @Date 2018/12/3 21:24
+ * @author yusiming
+ * @date 2018/12/3 21:24
  */
 public class OrderVo {
     private long orderNo;

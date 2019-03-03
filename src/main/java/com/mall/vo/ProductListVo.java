@@ -5,8 +5,8 @@ import java.math.BigDecimal;
 /**
  * ProductListVo 只需要Product的一部分属性，用来在列表中展示商品
  *
- * @Auther yusiming
- * @Date 2018/11/25 20:48
+ * @author yusiming
+ * @date 2018/11/25 20:48
  */
 public class ProductListVo {
     private Integer id;

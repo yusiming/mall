@@ -17,8 +17,8 @@ import javax.servlet.http.HttpSession;
 /**
  * 收货地址接口
  *
- * @Auther yusiming
- * @Date 2018/11/30 19:16
+ * @author yusiming
+ * @date 2018/11/30 19:16
  */
 @Controller
 @RequestMapping("/shipping/")

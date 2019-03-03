@@ -17,8 +17,8 @@ import javax.servlet.http.HttpSession;
 /**
  * 后台分类管理接口
  *
- * @Auther yusiming
- * @Date 2018/11/25 10:14
+ * @author yusiming
+ * @date 2018/11/25 10:14
  */
 @Controller
 @RequestMapping("/manage/category")

@@ -6,8 +6,8 @@ import java.math.RoundingMode;
 /**
  * 使用BigDecimal一定要使用String构造器
  *
- * @Auther yusiming
- * @Date 2018/11/29 20:02
+ * @author yusiming
+ * @date 2018/11/29 20:02
  */
 public class BigDecimalUtil {
     private BigDecimalUtil() {

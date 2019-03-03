@@ -11,8 +11,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @Auther yusiming
- * @Date 2018/11/23 10:52
+ * @author yusiming
+ * @date 2018/11/23 10:52
  */
 public class TokenCache {
     private static Logger logger = LoggerFactory.getLogger(TokenCache.class);

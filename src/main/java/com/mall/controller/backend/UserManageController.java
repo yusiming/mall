@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpSession;
 
 /**
- * @Auther yusiming
- * @Date 2018/11/23 13:16
+ * @author yusiming
+ * @date 2018/11/23 13:16
  */
 @Controller
 @RequestMapping("/manage/user")

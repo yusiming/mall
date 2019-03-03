@@ -25,8 +25,8 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * @Auther yusiming
- * @Date 2018/11/25 19:06
+ * @author yusiming
+ * @date 2018/11/25 19:06
  */
 @Service("iProductService")
 public class ProductServiceImpl implements IProductService {

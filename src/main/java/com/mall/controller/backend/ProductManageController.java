@@ -24,8 +24,8 @@ import java.util.Map;
 /**
  * 后台商品管理
  *
- * @Auther yusiming
- * @Date 2018/11/25 18:54
+ * @author yusiming
+ * @date 2018/11/25 18:54
  */
 @Controller
 @RequestMapping("/manage/product/")

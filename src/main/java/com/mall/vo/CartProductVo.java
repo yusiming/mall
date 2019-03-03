@@ -5,8 +5,8 @@ import java.math.BigDecimal;
 /**
  * 结合了商品和购物车的一个抽象对象
  *
- * @Auther yusiming
- * @Date 2018/11/29 19:39
+ * @author yusiming
+ * @date 2018/11/29 19:39
  */
 public class CartProductVo {
     // 购物车id
