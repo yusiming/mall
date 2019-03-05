@@ -29,6 +29,14 @@ public class Const {
     }
 
     /**
+     * Redis中用户信息过期时间
+     */
+    public interface SessionExTime {
+        // 30分钟内
+        int TIME = 60 * 30;
+    }
+
+    /**
      * 商品销售状态枚举类
      */
     public enum ProductStatus {
@@ -192,10 +200,5 @@ public class Const {
             }
             throw new RuntimeException("没有对应的支付类型");
         }
-    }
-
-    public interface RedisPoolCache {
-        // session数据的过期时间
-        int REDIS_SESSION_EXTIME = 60 * 30;
     }
 }
