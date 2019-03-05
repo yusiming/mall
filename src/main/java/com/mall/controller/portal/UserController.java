@@ -5,6 +5,7 @@ import com.mall.common.ResponseCode;
 import com.mall.common.ServerResponse;
 import com.mall.pojo.User;
 import com.mall.service.IUserService;
+import com.mall.util.CookieUtil;
 import com.mall.util.JsonUtil;
 import com.mall.util.RedisPoolUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 /**
@@ -37,13 +39,13 @@ public class UserController {
      */
     @RequestMapping(value = "login.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse login(HttpSession session, String username, String password) {
+    public ServerResponse login(HttpSession session, HttpServletResponse httpServletResponse, String username, String password) {
         ServerResponse response = iUserService.login(username, password);
         if (response.isSuccess()) {
-            // session.setAttribute(Const.CURRENT_USER, response.getData());
-            // 这里将用户的登陆信息保存到redis中，而不再保存到session域中了
-            RedisPoolUtil.setEx(session.getId(), JsonUtil.objToString(response.getData()), Const.RedisPoolCache
-                    .REDIS_SESSION_EXTIME);
+            // 向客户端发送一个 name为login_cookie , value 为 UUID 的cookie
+            CookieUtil.sendLoginCookie(httpServletResponse, session.getId());
+            // 将用户信息保存到Redis服务器中
+            RedisPoolUtil.setEx(session.getId(), JsonUtil.objToString(response.getData()), Const.SessionExTime.TIME);
         }
         // 无论是否登陆成功，都返回response，如果成功，前台拿到信息可以显示到页面上，如果登陆失败，显示错误信息
         return response;
