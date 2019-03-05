@@ -100,10 +100,6 @@ public class UserController {
     @RequestMapping(value = "get_user_info.do", method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse getUserInfo(HttpSession session) {
-        String userJsonStr = RedisPoolUtil.get(session.getId());
-        if (StringUtils.isNotBlank(userJsonStr)) {
-            User user = JsonUtil.stringToObj(userJsonStr, User.class);
-        }
         ServerResponse<User> response = checkLogin(session);
         if (response.isSuccess()) {
             return ServerResponse.createBySuccess(response.getData());
