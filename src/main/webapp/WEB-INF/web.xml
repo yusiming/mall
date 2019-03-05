@@ -28,7 +28,11 @@
         <filter-name>characterEncodingFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
-
+    <!--
+    如果需要scope=request、session、globalSession作用的bean，就需要进行如下的配置
+    原因：sRequestContextListener实现ServletRequestListener监听器接口，该监听器监听HTTP请求事件，
+    web服务器接收的每一次请求都会通知该监听器。
+    -->
     <listener>
         <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
     </listener>
