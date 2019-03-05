@@ -8,7 +8,10 @@ import com.mall.pojo.Product;
 import com.mall.pojo.User;
 import com.mall.service.IFileService;
 import com.mall.service.IProductService;
+import com.mall.util.JsonUtil;
 import com.mall.util.PropertiesUtil;
+import com.mall.util.RedisPoolUtil;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,7 +45,12 @@ public class ProductManageController {
      * @return 如果用户未登陆或者不是管理员，返回错误的响应，否则返回成功的响应
      */
     private ServerResponse checkAdmin(HttpSession session) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
+        String userJsonStr = RedisPoolUtil.get(session.getId());
+        if (StringUtils.isBlank(userJsonStr)) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
+                    ResponseCode.NEED_LOGIN.getDesc());
+        }
+        User user = JsonUtil.stringToObj(userJsonStr, User.class);
         if (user == null) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
                     ResponseCode.NEED_LOGIN.getDesc());

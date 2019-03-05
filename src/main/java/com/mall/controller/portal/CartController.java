@@ -5,6 +5,9 @@ import com.mall.common.ResponseCode;
 import com.mall.common.ServerResponse;
 import com.mall.pojo.User;
 import com.mall.service.ICartService;
+import com.mall.util.JsonUtil;
+import com.mall.util.RedisPoolUtil;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -186,11 +189,12 @@ public class CartController {
      * @return 如果用户已经登陆，返回成功的响应，否则返回错误的响应
      */
     private ServerResponse<User> checkLogin(HttpSession session) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
-        if (user == null) {
+        String userJsonStr = RedisPoolUtil.get(session.getId());
+        if (StringUtils.isBlank(userJsonStr)) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
                     ResponseCode.NEED_LOGIN.getDesc());
         }
+        User user = JsonUtil.stringToObj(userJsonStr, User.class);
         return ServerResponse.createBySuccess(user);
     }
 }
