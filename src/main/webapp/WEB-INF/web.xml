@@ -16,11 +16,7 @@
         <filter-name>sessionExpireFilter</filter-name>
         <filter-class>com.mall.controller.common.SessionExpireFilter</filter-class>
     </filter>
-    <!--拦截所有*.do的请求-->
-    <filter-mapping>
-        <filter-name>sessionExpireFilter</filter-name>
-        <url-pattern>*.do</url-pattern>
-    </filter-mapping>
+
 
     <!--统一编码-->
     <filter>
@@ -38,6 +34,12 @@
     <filter-mapping>
         <filter-name>characterEncodingFilter</filter-name>
         <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <!--拦截所有*.do的请求-->
+    <filter-mapping>
+        <filter-name>sessionExpireFilter</filter-name>
+        <url-pattern>*.do</url-pattern>
     </filter-mapping>
     <!--
     如果需要scope=request、session、globalSession作用的bean，就需要进行如下的配置
