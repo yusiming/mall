@@ -35,6 +35,7 @@ public class RedisPool {
     // IP地址
     private static String redisIp = PropertiesUtil.getProperty("redis.ip", "192.168.0.200");
     private static int redisPort = Integer.parseInt(PropertiesUtil.getProperty("redis.port", "6379"));
+    private static String password = PropertiesUtil.getProperty("redis.password");
 
     /**
      * 初始化连接池
@@ -51,7 +52,7 @@ public class RedisPool {
         config.setTestOnReturn(testOnReturn);
         // 连接耗尽时阻塞直到超时，如果超时则抛出超时异常，如果设置为false，则连接耗尽时抛出异常，该属性默认值为true
         config.setBlockWhenExhausted(true);
-        pool = new JedisPool(config, redisIp, redisPort, 1000 * 2);
+        pool = new JedisPool(config, redisIp, redisPort, 1000 * 2, password);
     }
 
     static {
