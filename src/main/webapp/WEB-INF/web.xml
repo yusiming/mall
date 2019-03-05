@@ -11,6 +11,17 @@
         <param-value>classpath:spring/applicationContext*.xml</param-value>
     </context-param>
 
+    <!--重置session的过期时间-->
+    <filter>
+        <filter-name>sessionExpireFilter</filter-name>
+        <filter-class>com.mall.controller.common.SessionExpireFilter</filter-class>
+    </filter>
+    <!--拦截所有*.do的请求-->
+    <filter-mapping>
+        <filter-name>sessionExpireFilter</filter-name>
+        <url-pattern>*.do</url-pattern>
+    </filter-mapping>
+
     <!--统一编码-->
     <filter>
         <filter-name>characterEncodingFilter</filter-name>
