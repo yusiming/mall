@@ -10,7 +10,7 @@ import com.mall.common.ServerResponse;
 import com.mall.pojo.User;
 import com.mall.service.IOrderService;
 import com.mall.util.JsonUtil;
-import com.mall.util.RedisPoolUtil;
+import com.mall.util.ShardedRedisPoolUtil;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -218,7 +218,7 @@ public class OrderController {
      * @return 如果用户已经登陆，返回成功的响应，否则返回错误的响应
      */
     private ServerResponse<User> checkLogin(HttpSession session) {
-        String userJsonStr = RedisPoolUtil.get(session.getId());
+        String userJsonStr = ShardedRedisPoolUtil.get(session.getId());
         if (StringUtils.isBlank(userJsonStr)) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
                     ResponseCode.NEED_LOGIN.getDesc());

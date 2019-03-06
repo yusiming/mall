@@ -6,13 +6,13 @@ import org.slf4j.LoggerFactory;
 import redis.clients.jedis.ShardedJedis;
 
 /**
- * redis分布式连接池工具类
+ * Redis连接池工具，可以对Redis进行增删改查，还可以设置key的有效期
  *
  * @author yusiming
- * @date 2019/3/6 17:14
+ * @date 2018/12/27 09:59
  */
 public class ShardedRedisPoolUtil {
-    private static final Logger LOGGER = LoggerFactory.getLogger(RedisPoolUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ShardedRedisPoolUtil.class);
 
     /**
      * 设置键值对
@@ -136,11 +136,11 @@ public class ShardedRedisPoolUtil {
     }
 
     public static void main(String[] args) {
-        RedisPoolUtil.set("setKey", "setValue");
-        String value = RedisPoolUtil.get("setKey");
+        ShardedRedisPoolUtil.set("setKey", "setValue");
+        String value = ShardedRedisPoolUtil.get("setKey");
         System.out.println(value);
-        RedisPoolUtil.setEx("setExKey", "setExValue", 60 * 10);
-        RedisPoolUtil.expire("setKey", 60 * 10);
-        RedisPoolUtil.del("setExKey");
+        ShardedRedisPoolUtil.setEx("setExKey", "setExValue", 60 * 10);
+        ShardedRedisPoolUtil.expire("setKey", 60 * 10);
+        ShardedRedisPoolUtil.del("setExKey");
     }
 }

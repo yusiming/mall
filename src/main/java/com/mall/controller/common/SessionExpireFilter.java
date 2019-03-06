@@ -4,7 +4,7 @@ import com.mall.common.Const;
 import com.mall.pojo.User;
 import com.mall.util.CookieUtil;
 import com.mall.util.JsonUtil;
-import com.mall.util.RedisPoolUtil;
+import com.mall.util.ShardedRedisPoolUtil;
 import org.apache.commons.lang.StringUtils;
 
 import javax.servlet.*;
@@ -32,11 +32,11 @@ public class SessionExpireFilter implements Filter {
             // 这里必须要返回，否则会放行两次
             return;
         }
-        String userJsonStr = RedisPoolUtil.get(token);
+        String userJsonStr = ShardedRedisPoolUtil.get(token);
         if (StringUtils.isNotBlank(userJsonStr)) {
             User user = JsonUtil.stringToObj(userJsonStr, User.class);
             if (user != null) {
-                RedisPoolUtil.expire(token, Const.SessionExTime.TIME);
+                ShardedRedisPoolUtil.expire(token, Const.SessionExTime.TIME);
             }
         }
         filterChain.doFilter(servletRequest, servletResponse);

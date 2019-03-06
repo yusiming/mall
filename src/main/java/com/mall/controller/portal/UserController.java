@@ -7,7 +7,7 @@ import com.mall.pojo.User;
 import com.mall.service.IUserService;
 import com.mall.util.CookieUtil;
 import com.mall.util.JsonUtil;
-import com.mall.util.RedisPoolUtil;
+import com.mall.util.ShardedRedisPoolUtil;
 import com.mall.util.UUIDUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +47,7 @@ public class UserController {
          * 3.如果校验通过将用户信息序列化后放入Redis缓存中，同时向客户端注入cookie
          * 4.如果校验未通过，返回提示信息
          */
-        String userJsonStr = RedisPoolUtil.get(CookieUtil.getLoginCookie(request));
+        String userJsonStr = ShardedRedisPoolUtil.get(CookieUtil.getLoginCookie(request));
         if (StringUtils.isNotBlank(userJsonStr)) {
             return ServerResponse.createBySuccessMsg("请勿重复登陆！");
         }
@@ -55,7 +55,7 @@ public class UserController {
         if (response.isSuccess()) {
             String token = UUIDUtil.randomUUID();
             CookieUtil.sendLoginCookie(httpServletResponse, token);
-            RedisPoolUtil.setEx(token, JsonUtil.objToString(response.getData()), Const.SessionExTime.TIME);
+            ShardedRedisPoolUtil.setEx(token, JsonUtil.objToString(response.getData()), Const.SessionExTime.TIME);
         }
         return response;
     }
@@ -79,7 +79,7 @@ public class UserController {
         if (token == null) {
             return ServerResponse.createByErrorMessage("您还未登陆！");
         }
-        RedisPoolUtil.del(token);
+        ShardedRedisPoolUtil.del(token);
         return ServerResponse.createBySuccess();
     }
 
@@ -200,7 +200,7 @@ public class UserController {
             ServerResponse updateResponse = iUserService.updateUserInfo(user);
             if (updateResponse.isSuccess()) {
                 String token = CookieUtil.getLoginCookie(request);
-                RedisPoolUtil.set(token, JsonUtil.objToString(user));
+                ShardedRedisPoolUtil.set(token, JsonUtil.objToString(user));
             }
             return updateResponse;
         }
@@ -237,7 +237,7 @@ public class UserController {
     private ServerResponse<User> checkLogin(HttpServletRequest httpServletRequest) {
         String token = CookieUtil.getLoginCookie(httpServletRequest);
         if (token != null) {
-            User user = JsonUtil.stringToObj(RedisPoolUtil.get(token), User.class);
+            User user = JsonUtil.stringToObj(ShardedRedisPoolUtil.get(token), User.class);
             if (user != null) {
                 return ServerResponse.createBySuccess(user);
             }

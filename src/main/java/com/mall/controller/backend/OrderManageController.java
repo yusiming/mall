@@ -6,7 +6,7 @@ import com.mall.common.ServerResponse;
 import com.mall.pojo.User;
 import com.mall.service.IOrderService;
 import com.mall.util.JsonUtil;
-import com.mall.util.RedisPoolUtil;
+import com.mall.util.ShardedRedisPoolUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -33,7 +33,7 @@ public class OrderManageController {
      * @return 如果用户未登陆或者不是管理员，返回错误的响应，否则返回成功的响应
      */
     private ServerResponse checkAdmin(HttpSession session) {
-        String userJsonStr = RedisPoolUtil.get(session.getId());
+        String userJsonStr = ShardedRedisPoolUtil.get(session.getId());
         if (StringUtils.isBlank(userJsonStr)) {
             return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
                     ResponseCode.NEED_LOGIN.getDesc());

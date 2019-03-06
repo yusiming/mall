@@ -6,7 +6,7 @@ import com.mall.pojo.User;
 import com.mall.service.IUserService;
 import com.mall.util.CookieUtil;
 import com.mall.util.JsonUtil;
-import com.mall.util.RedisPoolUtil;
+import com.mall.util.ShardedRedisPoolUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,7 +44,7 @@ public class UserManageController {
                 // 向客户端发送一个 name为login_cookie , value 为 UUID 的cookie
                 CookieUtil.sendLoginCookie(httpServletResponse, session.getId());
                 // 将用户信息保存到Redis服务器中
-                RedisPoolUtil.setEx(session.getId(), JsonUtil.objToString(response.getData()), Const.SessionExTime.TIME);
+                ShardedRedisPoolUtil.setEx(session.getId(), JsonUtil.objToString(response.getData()), Const.SessionExTime.TIME);
                 return response;
             } else {
                 return ServerResponse.createByErrorMessage("不是管理员无法登陆");
