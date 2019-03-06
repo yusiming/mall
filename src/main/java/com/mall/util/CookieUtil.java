@@ -33,6 +33,8 @@ public class CookieUtil {
         cookie.setPath("/");
         // cookie的过期时间为一个月
         cookie.setMaxAge(60 * 60 * 24 * 30);
+        // 这个属性可以有效防止网站脚本攻击
+        cookie.setHttpOnly(true);
         LOGGER.info("send cookieName:{} value:", COOKIE_NAME, token);
         response.addCookie(cookie);
     }
@@ -51,7 +53,7 @@ public class CookieUtil {
         }
         for (Cookie cookie : cookies) {
             if (COOKIE_NAME.equals(cookie.getName())) {
-                LOGGER.info("get cookieName:{} value:{} ", COOKIE_NAME, cookie.getName());
+                LOGGER.info("get cookieName:{} value:{} ", COOKIE_NAME, cookie.getValue());
                 return cookie.getValue();
             }
         }
@@ -71,9 +73,12 @@ public class CookieUtil {
         }
         for (Cookie cookie : cookies) {
             if (COOKIE_NAME.equals(cookie.getName())) {
+                // 必须重新设置域，path，和maxAge才能删除cookie
+                cookie.setDomain(COOKIE_DOMAIN);
+                cookie.setPath("/");
                 cookie.setMaxAge(0);
                 response.addCookie(cookie);
-                LOGGER.info("del cookie value{}" + cookie.getValue());
+                LOGGER.info("del cookie value{}", cookie.getValue());
                 return cookie.getValue();
             }
         }
