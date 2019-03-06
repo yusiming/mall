@@ -9,9 +9,9 @@ import com.mall.common.ResponseCode;
 import com.mall.common.ServerResponse;
 import com.mall.pojo.User;
 import com.mall.service.IOrderService;
+import com.mall.util.CookieUtil;
 import com.mall.util.JsonUtil;
 import com.mall.util.ShardedRedisPoolUtil;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.util.Map;
 
 /**
@@ -41,14 +40,14 @@ public class OrderController {
      * 用户创建订单
      * 前台只需要传递shippingId，收货地址即可，所有的其他会通过当前登陆的用户来获取
      *
-     * @param session    session域
+     * @param request    request
      * @param shippingId 用户收货地址信息
      * @return 响应
      */
     @RequestMapping("create.do")
     @ResponseBody
-    public ServerResponse create(HttpSession session, Integer shippingId) {
-        ServerResponse<User> response = checkLogin(session);
+    public ServerResponse create(HttpServletRequest request, Integer shippingId) {
+        ServerResponse<User> response = checkLogin(request);
         if (response.isSuccess()) {
             return iOrderService.createOrder(response.getData().getId(), shippingId);
         }
@@ -58,14 +57,14 @@ public class OrderController {
     /**
      * 用户取消订单
      *
-     * @param session session域
+     * @param request request
      * @param orderNo 订单编号
      * @return 响应
      */
     @RequestMapping("cancel.do")
     @ResponseBody
-    public ServerResponse cancel(HttpSession session, long orderNo) {
-        ServerResponse<User> response = checkLogin(session);
+    public ServerResponse cancel(HttpServletRequest request, long orderNo) {
+        ServerResponse<User> response = checkLogin(request);
         if (response.isSuccess()) {
             return iOrderService.cancel(response.getData().getId(), orderNo);
         }
@@ -75,13 +74,13 @@ public class OrderController {
     /**
      * 生成订单之前获取订单的信息（购物车中已勾选的商品所生成的信息），给用户展示，确认订单
      *
-     * @param session session域
+     * @param request request
      * @return 响应
      */
     @RequestMapping("get_order_cart_product.do")
     @ResponseBody
-    public ServerResponse getOrderCartProduct(HttpSession session) {
-        ServerResponse<User> response = checkLogin(session);
+    public ServerResponse getOrderCartProduct(HttpServletRequest request) {
+        ServerResponse<User> response = checkLogin(request);
         if (response.isSuccess()) {
             return iOrderService.getOrderCartProduct(response.getData().getId());
         }
@@ -92,16 +91,16 @@ public class OrderController {
      * 支付宝支付接口
      * 订单支付
      *
-     * @param session session域
+     * @param request request
      * @param orderNo 订单号
      * @return 响应
      */
     @RequestMapping("pay.do")
     @ResponseBody
-    public ServerResponse pay(HttpSession session, long orderNo) {
-        ServerResponse<User> response = checkLogin(session);
+    public ServerResponse pay(HttpServletRequest request, long orderNo) {
+        ServerResponse<User> response = checkLogin(request);
         if (response.isSuccess()) {
-            String path = session.getServletContext().getRealPath("upload");
+            String path = request.getServletContext().getRealPath("upload");
             return iOrderService.pay(response.getData().getId(), orderNo, path);
         }
         return response;
@@ -158,14 +157,14 @@ public class OrderController {
     /**
      * 查询订单支付状态，订单知否已经支付成功
      *
-     * @param session session
+     * @param request session
      * @param orderNo 订单号
      * @return 响应
      */
     @RequestMapping("query_order_pay_status.do")
     @ResponseBody
-    public ServerResponse queryOrderPayStatus(HttpSession session, long orderNo) {
-        ServerResponse<User> response = checkLogin(session);
+    public ServerResponse queryOrderPayStatus(HttpServletRequest request, long orderNo) {
+        ServerResponse<User> response = checkLogin(request);
         if (response.isSuccess()) {
             if (iOrderService.queryOrderPayStatus(response.getData().getId(), orderNo).isSuccess()) {
                 return ServerResponse.createBySuccess(true);
@@ -178,14 +177,14 @@ public class OrderController {
     /**
      * 获取订单详情
      *
-     * @param session session域
+     * @param request session域
      * @param orderNo 订单号
      * @return 响应
      */
     @RequestMapping("detail.do")
     @ResponseBody
-    public ServerResponse detail(HttpSession session, long orderNo) {
-        ServerResponse<User> response = checkLogin(session);
+    public ServerResponse detail(HttpServletRequest request, long orderNo) {
+        ServerResponse<User> response = checkLogin(request);
         if (response.isSuccess()) {
             return iOrderService.getOrderDetail(response.getData().getId(), orderNo);
         }
@@ -195,16 +194,16 @@ public class OrderController {
     /**
      * 用户查看订单列表
      *
-     * @param session  session域
+     * @param request  request
      * @param pageNum  第几页
      * @param pageSize 每页数据的大小
      */
     @RequestMapping("list.do")
     @ResponseBody
-    public ServerResponse list(HttpSession session,
+    public ServerResponse list(HttpServletRequest request,
                                @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
                                @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
-        ServerResponse<User> response = checkLogin(session);
+        ServerResponse<User> response = checkLogin(request);
         if (response.isSuccess()) {
             return iOrderService.getOrderList(response.getData().getId(), pageNum, pageSize);
         }
@@ -214,17 +213,19 @@ public class OrderController {
     /**
      * 校验用户是否已登陆
      *
-     * @param session session域
+     * @param httpServletRequest request
      * @return 如果用户已经登陆，返回成功的响应，否则返回错误的响应
      */
-    private ServerResponse<User> checkLogin(HttpSession session) {
-        String userJsonStr = ShardedRedisPoolUtil.get(session.getId());
-        if (StringUtils.isBlank(userJsonStr)) {
-            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
-                    ResponseCode.NEED_LOGIN.getDesc());
+    private ServerResponse<User> checkLogin(HttpServletRequest httpServletRequest) {
+        String token = CookieUtil.getLoginCookie(httpServletRequest);
+        if (token != null) {
+            User user = JsonUtil.stringToObj(ShardedRedisPoolUtil.get(token), User.class);
+            if (user != null) {
+                return ServerResponse.createBySuccess(user);
+            }
         }
-        User user = JsonUtil.stringToObj(userJsonStr, User.class);
-        return ServerResponse.createBySuccess(user);
+        return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
+                ResponseCode.NEED_LOGIN.getDesc());
     }
 
 }
