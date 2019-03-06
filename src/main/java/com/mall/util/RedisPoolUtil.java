@@ -22,6 +22,9 @@ public class RedisPoolUtil {
      * @return 响应状态码
      */
     public static String set(String key, String value) {
+        if (key == null || value == null) {
+            return null;
+        }
         Jedis jedis = null;
         String result = null;
         try {
@@ -42,6 +45,10 @@ public class RedisPoolUtil {
      * @return 对应的value
      */
     public static String get(String key) {
+        // 如果key为空直接返回
+        if (key == null) {
+            return null;
+        }
         Jedis jedis = null;
         String result = null;
         try {
@@ -62,6 +69,9 @@ public class RedisPoolUtil {
      * @return 返回删除的键的数量，如果该键不存在，返回0
      */
     public static Long del(String key) {
+        if (key == null) {
+            return null;
+        }
         Jedis jedis = null;
         Long result = null;
         try {
@@ -85,6 +95,9 @@ public class RedisPoolUtil {
      * @return 响应状态码
      */
     public static String setEx(String key, String value, int exTime) {
+        if (key == null || value == null) {
+            return null;
+        }
         Jedis jedis = null;
         String result = null;
         try {
@@ -106,6 +119,9 @@ public class RedisPoolUtil {
      * @return 返回1，表示设置成功，返回0表示设置失败（键不存在，或者redis版本小于2.1.3时，并且该键已经设置了过期时间）
      */
     public static Long expire(String key, int exTime) {
+        if (key == null) {
+            return null;
+        }
         Jedis jedis = null;
         Long result = null;
         try {
