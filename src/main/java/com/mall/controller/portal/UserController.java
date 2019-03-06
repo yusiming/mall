@@ -9,6 +9,7 @@ import com.mall.util.CookieUtil;
 import com.mall.util.JsonUtil;
 import com.mall.util.RedisPoolUtil;
 import com.mall.util.UUIDUtil;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,8 +48,8 @@ public class UserController {
          * 3.如果校验通过将用户信息序列化后放入Redis缓存中，同时向客户端注入cookie
          * 4.如果校验未通过，返回提示信息
          */
-        User user = JsonUtil.stringToObj(RedisPoolUtil.get(CookieUtil.getLoginCookie(request)), User.class);
-        if (user != null) {
+        String userJsonStr = RedisPoolUtil.get(CookieUtil.getLoginCookie(request));
+        if (StringUtils.isNotBlank(userJsonStr)) {
             return ServerResponse.createBySuccessMsg("请勿重复登陆！");
         }
         ServerResponse response = iUserService.login(username, password);

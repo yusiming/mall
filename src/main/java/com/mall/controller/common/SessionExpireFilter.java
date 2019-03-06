@@ -29,6 +29,7 @@ public class SessionExpireFilter implements Filter {
         String token = CookieUtil.getLoginCookie(request);
         if (StringUtils.isBlank(token)) {
             filterChain.doFilter(servletRequest, servletResponse);
+            // 这里必须要返回，否则会放行两次
             return;
         }
         String userJsonStr = RedisPoolUtil.get(token);
