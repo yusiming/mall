@@ -44,7 +44,11 @@ public class CookieUtil {
      * @return 返回令牌
      */
     public static String getLoginCookie(HttpServletRequest request) {
+        // 这里获取的数组可能为空
         Cookie[] cookies = request.getCookies();
+        if (cookies == null) {
+            return null;
+        }
         for (Cookie cookie : cookies) {
             if (COOKIE_NAME.equals(cookie.getName())) {
                 LOGGER.info("get cookieName:{} value:{} ", COOKIE_NAME, cookie.getName());
