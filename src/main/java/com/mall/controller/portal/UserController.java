@@ -38,7 +38,7 @@ public class UserController {
      * @param password 用户密码
      * @return 如果登陆成功，返回一个成功的响应，如果登陆失败返回一个错误的响应
      */
-    @RequestMapping(value = "login.do", method = RequestMethod.GET)
+    @RequestMapping(value = "login.do", method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse login(HttpServletResponse httpServletResponse, HttpServletRequest request, String username, String password) {
         /*
@@ -189,7 +189,7 @@ public class UserController {
      * @param user    User对象
      * @return 响应
      */
-    @RequestMapping(value = "update_user_info.do", method = RequestMethod.GET)
+    @RequestMapping(value = "update_user_info.do", method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse updateUserInfo(HttpServletRequest request, User user) {
         ServerResponse<User> response = checkLogin(request);
