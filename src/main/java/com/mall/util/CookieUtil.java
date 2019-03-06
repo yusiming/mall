@@ -59,19 +59,23 @@ public class CookieUtil {
     }
 
     /**
-     * 删除保存的cookie
+     * 删除用户端注入的cookie
      *
-     * @param response
-     * @param token
+     * @param request  请求
+     * @param response 响应
      */
-    public static void delLoginCookie(HttpServletResponse response, String token) {
-        // cookie的name属性
-        Cookie cookie = new Cookie(COOKIE_NAME, token);
-        cookie.setDomain(COOKIE_DOMAIN);
-        // 将cookie的maxAge设置为0删除cookie
-        cookie.setMaxAge(0);
-        LOGGER.info("del cookieName:{} value:{} ", COOKIE_NAME, cookie.getName());
-        response.addCookie(cookie);
+    public static void delLoginCookie(HttpServletRequest request, HttpServletResponse response) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null) {
+            return;
+        }
+        for (Cookie cookie : cookies) {
+            if (COOKIE_NAME.equals(cookie.getName())) {
+                cookie.setMaxAge(0);
+                response.addCookie(cookie);
+                LOGGER.info("del cookie value{}" + cookie.getValue());
+            }
+        }
     }
 
 }
