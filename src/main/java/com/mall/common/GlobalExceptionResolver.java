@@ -2,6 +2,7 @@ package com.mall.common;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.json.MappingJacksonJsonView;
@@ -15,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
  * @author yusiming
  * @date 2019/3/6 21:44
  */
+@Component
 public class GlobalExceptionResolver implements HandlerExceptionResolver {
     private static Logger LOGGER = LoggerFactory.getLogger(GlobalExceptionResolver.class);
 

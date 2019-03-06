@@ -12,7 +12,7 @@
     <aop:aspectj-autoproxy/>
 
     <import resource="classpath:spring/applicationContext-datasource.xml"/>
-    <!--将全局的异常处理器注册到容器中-->
-    <bean id="globalExceptionResolver" class="com.mall.common.GlobalExceptionResolver"/>
+    <!--&lt;!&ndash;将全局的异常处理器注册到容器中&ndash;&gt;-->
+    <!--<bean id="globalExceptionResolver" class="com.mall.common.GlobalExceptionResolver"/>-->
 
 </beans>
