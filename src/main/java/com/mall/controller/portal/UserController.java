@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 /**
  * 前台用户接口
@@ -39,7 +38,7 @@ public class UserController {
      * @param password 用户密码
      * @return 如果登陆成功，返回一个成功的响应，如果登陆失败返回一个错误的响应
      */
-    @RequestMapping(value = "login.do", method = RequestMethod.POST)
+    @RequestMapping(value = "login.do", method = RequestMethod.GET)
     @ResponseBody
     public ServerResponse login(HttpServletResponse httpServletResponse, HttpServletRequest request, String username, String password) {
         /*
@@ -68,7 +67,7 @@ public class UserController {
      * @param response 响应
      * @return 如果用户未登陆，返回提示信息，如果已登陆返回成功提示
      */
-    @RequestMapping(value = "logout.do", method = RequestMethod.POST)
+    @RequestMapping(value = "logout.do", method = RequestMethod.GET)
     @ResponseBody
     public ServerResponse logout(HttpServletRequest request, HttpServletResponse response) {
         /*
@@ -112,12 +111,12 @@ public class UserController {
     /**
      * 获取登陆用户信息
      *
-     * @param session session域对象
-     * @return 若用户未登陆，返回错误的响应对象，否则返回正确的响应对象，将user的信息传递给前端
+     * @param httpServletRequest 请求
+     * @return 如果用户未登陆，返回提示信息，否则返回用户信息
      */
-    @RequestMapping(value = "get_user_info.do", method = RequestMethod.POST)
+    @RequestMapping(value = "get_user_info.do", method = RequestMethod.GET)
     @ResponseBody
-    public ServerResponse getUserInfo(HttpSession session, HttpServletRequest httpServletRequest) {
+    public ServerResponse getUserInfo(HttpServletRequest httpServletRequest) {
         ServerResponse<User> response = checkLogin(httpServletRequest);
         if (response.isSuccess()) {
             return ServerResponse.createBySuccess(response.getData());
@@ -190,7 +189,7 @@ public class UserController {
      * @param user    User对象
      * @return 响应
      */
-    @RequestMapping(value = "update_user_info.do", method = RequestMethod.POST)
+    @RequestMapping(value = "update_user_info.do", method = RequestMethod.GET)
     @ResponseBody
     public ServerResponse updateUserInfo(HttpServletRequest request, User user) {
         ServerResponse<User> response = checkLogin(request);
@@ -198,7 +197,6 @@ public class UserController {
             User currentUser = response.getData();
             // 防止用户越权，将user对象的id设置为session域中user的id，这样就保证了user只能改自己的信息
             user.setId(currentUser.getId());
-            user.setUsername(currentUser.getUsername());
             ServerResponse updateResponse = iUserService.updateUserInfo(user);
             if (updateResponse.isSuccess()) {
                 String token = CookieUtil.getLoginCookie(request);
@@ -215,7 +213,7 @@ public class UserController {
      * @param request 请求
      * @return 如果用户已登陆返回用户信息，如果未登陆，返回提示信息
      */
-    @RequestMapping(value = "get_information.do", method = RequestMethod.POST)
+    @RequestMapping(value = "get_information.do", method = RequestMethod.GET)
     @ResponseBody
     public ServerResponse getInformation(HttpServletRequest request) {
         /*
