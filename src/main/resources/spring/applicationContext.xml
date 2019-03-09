@@ -4,10 +4,15 @@
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:aop="http://www.springframework.org/schema/aop"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
-    <context:component-scan base-package="com.mall"/>
+    <!--不扫描Controller注解的bean-->
+    <context:component-scan base-package="com.mall" annotation-config="true">
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
 
     <aop:aspectj-autoproxy/>
 
-   <import resource="classpath:spring/applicationContext-datasource.xml"/>
+    <import resource="classpath:spring/applicationContext-datasource.xml"/>
+    <!--&lt;!&ndash;将全局的异常处理器注册到容器中&ndash;&gt;-->
+    <!--<bean id="globalExceptionResolver" class="com.mall.common.GlobalExceptionResolver"/>-->
 
 </beans>

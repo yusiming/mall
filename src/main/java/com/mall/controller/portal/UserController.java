@@ -5,13 +5,19 @@ import com.mall.common.ResponseCode;
 import com.mall.common.ServerResponse;
 import com.mall.pojo.User;
 import com.mall.service.IUserService;
+import com.mall.util.CookieUtil;
+import com.mall.util.JsonUtil;
+import com.mall.util.ShardedRedisPoolUtil;
+import com.mall.util.UUIDUtil;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * 前台用户接口
@@ -28,32 +34,52 @@ public class UserController {
     /**
      * 用户登陆，限制为post请求
      *
-     * @param session  session域
      * @param username 用户名称
      * @param password 用户密码
      * @return 如果登陆成功，返回一个成功的响应，如果登陆失败返回一个错误的响应
      */
     @RequestMapping(value = "login.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse login(HttpSession session, String username, String password) {
+    public ServerResponse login(HttpServletResponse httpServletResponse, HttpServletRequest request, String username, String password) {
+        /*
+         * 1.如果从redis缓存中拿到了用户信息，证明已经登陆，无需从数据库中查询
+         * 2.如果没有拿到信息，校验用户名称、密码是否正确
+         * 3.如果校验通过将用户信息序列化后放入Redis缓存中，同时向客户端注入cookie
+         * 4.如果校验未通过，返回提示信息
+         */
+        String userJsonStr = ShardedRedisPoolUtil.get(CookieUtil.getLoginCookie(request));
+        if (StringUtils.isNotBlank(userJsonStr)) {
+            return ServerResponse.createBySuccessMsg("请勿重复登陆！");
+        }
         ServerResponse response = iUserService.login(username, password);
         if (response.isSuccess()) {
-            session.setAttribute(Const.CURRENT_USER, response.getData());
+            String token = UUIDUtil.randomUUID();
+            CookieUtil.sendLoginCookie(httpServletResponse, token);
+            ShardedRedisPoolUtil.setEx(token, JsonUtil.objToString(response.getData()), Const.SessionExTime.TIME);
         }
-        // 无论是否登陆成功，都返回response，如果成功，前台拿到信息可以显示到页面上，如果登陆失败，显示错误信息
         return response;
     }
 
     /**
-     * 用户登出，将session域中user对象删除即可
+     * 用户登出
      *
-     * @param session session域
-     * @return 响应
+     * @param request  请求
+     * @param response 响应
+     * @return 如果用户未登陆，返回提示信息，如果已登陆返回成功提示
      */
     @RequestMapping(value = "logout.do", method = RequestMethod.GET)
     @ResponseBody
-    public ServerResponse logout(HttpSession session) {
-        session.removeAttribute(Const.CURRENT_USER);
+    public ServerResponse logout(HttpServletRequest request, HttpServletResponse response) {
+        /*
+         * 1.删除向用户端注入的cookie
+         * 2.如果cookie不存在，则证明用户尚未登陆
+         * 3.如果cookie存在，根据token值删除redis缓存中的用户信息
+         */
+        String token = CookieUtil.delLoginCookie(request, response);
+        if (token == null) {
+            return ServerResponse.createByErrorMessage("您还未登陆！");
+        }
+        ShardedRedisPoolUtil.del(token);
         return ServerResponse.createBySuccess();
     }
 
@@ -83,15 +109,15 @@ public class UserController {
     }
 
     /**
-     * 从session中获取登陆用户信息
+     * 获取登陆用户信息
      *
-     * @param session session域对象
-     * @return 若用户未登陆，返回错误的响应对象，否则返回正确的响应对象，将user的信息传递给前端
+     * @param httpServletRequest 请求
+     * @return 如果用户未登陆，返回提示信息，否则返回用户信息
      */
-    @RequestMapping(value = "get_user_info.do", method = RequestMethod.POST)
+    @RequestMapping(value = "get_user_info.do", method = RequestMethod.GET)
     @ResponseBody
-    public ServerResponse getUserInfo(HttpSession session) {
-        ServerResponse<User> response = checkLogin(session);
+    public ServerResponse getUserInfo(HttpServletRequest httpServletRequest) {
+        ServerResponse<User> response = checkLogin(httpServletRequest);
         if (response.isSuccess()) {
             return ServerResponse.createBySuccess(response.getData());
         }
@@ -141,15 +167,15 @@ public class UserController {
     /**
      * 登陆状态下重置用户密码
      *
-     * @param session     session
+     * @param request     session
      * @param passwordOld 旧密码
      * @param passwordNew 新密码
      * @return 响应
      */
     @RequestMapping(value = "reset_password.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse resetPassword(HttpSession session, String passwordOld, String passwordNew) {
-        ServerResponse<User> response = checkLogin(session);
+    public ServerResponse resetPassword(HttpServletRequest request, String passwordOld, String passwordNew) {
+        ServerResponse<User> response = checkLogin(request);
         if (response.isSuccess()) {
             return iUserService.resetPassword(response.getData().getId(), passwordOld, passwordNew);
         }
@@ -159,23 +185,22 @@ public class UserController {
     /**
      * 登陆状态下更新用户信息
      *
-     * @param session session域
+     * @param request request
      * @param user    User对象
      * @return 响应
      */
     @RequestMapping(value = "update_user_info.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse updateUserInfo(HttpSession session, User user) {
-        ServerResponse<User> response = checkLogin(session);
+    public ServerResponse updateUserInfo(HttpServletRequest request, User user) {
+        ServerResponse<User> response = checkLogin(request);
         if (response.isSuccess()) {
             User currentUser = response.getData();
             // 防止用户越权，将user对象的id设置为session域中user的id，这样就保证了user只能改自己的信息
             user.setId(currentUser.getId());
-            user.setUsername(currentUser.getUsername());
             ServerResponse updateResponse = iUserService.updateUserInfo(user);
             if (updateResponse.isSuccess()) {
-                // 在session域中放入更新过的用户信息
-                session.setAttribute(Const.CURRENT_USER, response.getData());
+                String token = CookieUtil.getLoginCookie(request);
+                ShardedRedisPoolUtil.set(token, JsonUtil.objToString(user));
             }
             return updateResponse;
         }
@@ -183,15 +208,20 @@ public class UserController {
     }
 
     /**
-     * 获取当前登陆用户详细信息
+     * 获取登陆用户详细信息
      *
-     * @param session session域
-     * @return 响应
+     * @param request 请求
+     * @return 如果用户已登陆返回用户信息，如果未登陆，返回提示信息
      */
-    @RequestMapping(value = "get_information.do", method = RequestMethod.POST)
+    @RequestMapping(value = "get_information.do", method = RequestMethod.GET)
     @ResponseBody
-    public ServerResponse getInformation(HttpSession session) {
-        ServerResponse<User> response = checkLogin(session);
+    public ServerResponse getInformation(HttpServletRequest request) {
+        /*
+         * 1.判断用户是否登陆
+         * 2.如果已登陆，根据用户id从数据库中获取详细信息
+         * 3.如果未登陆，返回提示信息
+         */
+        ServerResponse<User> response = checkLogin(request);
         if (response.isSuccess()) {
             return iUserService.getInformation(response.getData().getId());
         }
@@ -199,17 +229,20 @@ public class UserController {
     }
 
     /**
-     * 校验用户是否已登陆
+     * 校验用户是否已经登陆
      *
-     * @param session session域
-     * @return 如果用户已经登陆，返回成功的响应，否则返回错误的响应
+     * @param httpServletRequest request
+     * @return 如果已经登陆，将用户信息返回，如果未登陆，返回提示信息
      */
-    private ServerResponse<User> checkLogin(HttpSession session) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
-        if (user == null) {
-            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
-                    ResponseCode.NEED_LOGIN.getDesc());
+    private ServerResponse<User> checkLogin(HttpServletRequest httpServletRequest) {
+        String token = CookieUtil.getLoginCookie(httpServletRequest);
+        if (token != null) {
+            User user = JsonUtil.stringToObj(ShardedRedisPoolUtil.get(token), User.class);
+            if (user != null) {
+                return ServerResponse.createBySuccess(user);
+            }
         }
-        return ServerResponse.createBySuccess(user);
+        return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
+                ResponseCode.NEED_LOGIN.getDesc());
     }
 }

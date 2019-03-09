@@ -242,8 +242,9 @@ public class UserServiceImpl implements IUserService {
         if (resultCount > 0) {
             return ServerResponse.createByErrorMessage("email已经被注册");
         }
-        // 只更新email、phone、question、answer字段
+        // 只更新name,email、phone、question、answer字段
         User updateUser = new User();
+        updateUser.setUsername(user.getUsername());
         updateUser.setId(user.getId());
         updateUser.setEmail(user.getEmail());
         updateUser.setPhone(user.getPhone());

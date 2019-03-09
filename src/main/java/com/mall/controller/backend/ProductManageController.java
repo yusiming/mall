@@ -8,7 +8,10 @@ import com.mall.pojo.Product;
 import com.mall.pojo.User;
 import com.mall.service.IFileService;
 import com.mall.service.IProductService;
+import com.mall.util.CookieUtil;
+import com.mall.util.JsonUtil;
 import com.mall.util.PropertiesUtil;
+import com.mall.util.ShardedRedisPoolUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,8 +20,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.util.Map;
 
 /**
@@ -38,31 +41,33 @@ public class ProductManageController {
     /**
      * 校验用户是否为管理员
      *
-     * @param session session域
+     * @param request request
      * @return 如果用户未登陆或者不是管理员，返回错误的响应，否则返回成功的响应
      */
-    private ServerResponse checkAdmin(HttpSession session) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
-        if (user == null) {
-            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
-                    ResponseCode.NEED_LOGIN.getDesc());
-        } else if (user.getRole() != Const.Role.ROLE_ADMIN) {
-            return ServerResponse.createByErrorMessage("您不是管理员，请勿随意登陆，否则我们将封禁您的IP!");
+    private ServerResponse checkAdmin(HttpServletRequest request) {
+        String token = CookieUtil.getLoginCookie(request);
+        if (token != null) {
+            User user = JsonUtil.stringToObj(ShardedRedisPoolUtil.get(token), User.class);
+            if (user != null && user.getRole().equals(Const.Role.ROLE_ADMIN)) {
+                return ServerResponse.createBySuccess();
+            }
+            return ServerResponse.createByErrorMessage("您不是管理员，请勿随意登陆!");
         }
-        return ServerResponse.createBySuccess();
+        return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),
+                ResponseCode.NEED_LOGIN.getDesc());
     }
 
     /**
      * 保存商品信息
      *
-     * @param session session域
+     * @param request request
      * @param product 通过springMVC参数绑定得到的商品对象
      * @return 给前台的响应
      */
     @RequestMapping("save_product.do")
     @ResponseBody
-    public ServerResponse productSave(HttpSession session, Product product) {
-        ServerResponse response = checkAdmin(session);
+    public ServerResponse productSave(HttpServletRequest request, Product product) {
+        ServerResponse response = checkAdmin(request);
         if (response.isSuccess()) {
             return iProductService.saveOrUpdateProduct(product);
         }
@@ -72,15 +77,15 @@ public class ProductManageController {
     /**
      * 设置商品的销售状态（产品上下架）
      *
-     * @param session   session域对象
+     * @param request   request
      * @param productId 商品的id
      * @param status    商品新的的状态
      * @return 响应
      */
     @RequestMapping("set_sale_status.do")
     @ResponseBody
-    public ServerResponse setSaleStatus(HttpSession session, Integer productId, Integer status) {
-        ServerResponse response = checkAdmin(session);
+    public ServerResponse setSaleStatus(HttpServletRequest request, Integer productId, Integer status) {
+        ServerResponse response = checkAdmin(request);
         if (response.isSuccess()) {
             return iProductService.setSaleStatus(productId, status);
         }
@@ -90,14 +95,14 @@ public class ProductManageController {
     /**
      * 获取商品详细信息
      *
-     * @param session   session
+     * @param request   request
      * @param productId 商品id
      * @return 响应
      */
     @RequestMapping("get_product_detail.do")
     @ResponseBody
-    public ServerResponse getDetail(HttpSession session, Integer productId) {
-        ServerResponse response = checkAdmin(session);
+    public ServerResponse getDetail(HttpServletRequest request, Integer productId) {
+        ServerResponse response = checkAdmin(request);
         if (response.isSuccess()) {
             return iProductService.manageProductDetail(productId);
         }
@@ -108,17 +113,17 @@ public class ProductManageController {
      * 查询所有商品
      * 需要分页，默认查询第一页，每页10条记录
      *
-     * @param session  session域
+     * @param request  request
      * @param pageNum  第几页
      * @param pageSize 每页的记录数
      * @return 响应
      */
     @RequestMapping("get_product_list.do")
     @ResponseBody
-    public ServerResponse getProductList(HttpSession session,
+    public ServerResponse getProductList(HttpServletRequest request,
                                          @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
                                          @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
-        ServerResponse response = checkAdmin(session);
+        ServerResponse response = checkAdmin(request);
         if (response.isSuccess()) {
             return iProductService.getProductList(pageNum, pageSize);
         }
@@ -126,7 +131,7 @@ public class ProductManageController {
     }
 
     /**
-     * @param session     session域
+     * @param request     request
      * @param productName 需要查询的商品名称
      * @param productId   需要查询的商品id
      * @param pageNum     第几页
@@ -135,10 +140,10 @@ public class ProductManageController {
      */
     @RequestMapping("search_product.do")
     @ResponseBody
-    public ServerResponse productSearch(HttpSession session, String productName, Integer productId,
+    public ServerResponse productSearch(HttpServletRequest request, String productName, Integer productId,
                                         @RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
                                         @RequestParam(value = "pageSize", defaultValue = "10") int pageSize) {
-        ServerResponse response = checkAdmin(session);
+        ServerResponse response = checkAdmin(request);
         if (response.isSuccess()) {
             return iProductService.searchProduct(productName, productId, pageNum, pageSize);
         }
@@ -149,16 +154,16 @@ public class ProductManageController {
      * 图片上传
      *
      * @param file    MultipartFile
-     * @param session session域
+     * @param request request
      * @return 响应，包含uri和url
      */
     @RequestMapping(value = "upload_image.do", method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse upload(@RequestParam(value = "uploadFile") MultipartFile file,
-                                 HttpSession session) {
-        ServerResponse response = checkAdmin(session);
+                                 HttpServletRequest request) {
+        ServerResponse response = checkAdmin(request);
         if (response.isSuccess()) {
-            String upload = session.getServletContext().getRealPath("upload");
+            String upload = request.getServletContext().getRealPath("upload");
             // 将文件上传到ftp服务中，返回targetFileName，上传文件的名称
             String targetFileName = iFileService.upload(file, upload);
             // 文件的完整地址，可以访问的地址
@@ -175,14 +180,14 @@ public class ProductManageController {
      * 富文本图片上传
      *
      * @param file            MultipartFile
-     * @param session         session域
+     * @param request         request
      * @param servletResponse HttpServletResponse
      * @return 返回simditor要求的响应
      */
     @RequestMapping(value = "richText_img_upload.do", method = RequestMethod.POST)
     @ResponseBody
     public Map richTextImgUpload(@RequestParam(value = "uploadFile", required = false) MultipartFile file,
-                                 HttpSession session, HttpServletResponse servletResponse) {
+                                 HttpServletRequest request, HttpServletResponse servletResponse) {
         // 富文本中对于返回值有特定的要求，我们使用的simditor，所以需要按照它的要求进行返回，simditor接收到返回值会进行判断上传图片是否成功之类的
         // JSON response after uploading complete:
         // {
@@ -191,14 +196,15 @@ public class ProductManageController {
         //   "file_path": "[real file path]"
         // }
         Map<String, Object> map = Maps.newHashMap();
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
+        ServerResponse serverResponse = checkAdmin(request);
+        User user = (User) serverResponse.getData();
         if (user == null) {
             map.put("success", false);
             map.put("msg", "未登陆");
             return map;
         }
         if (user.getRole() == Const.Role.ROLE_ADMIN) {
-            String upload = session.getServletContext().getRealPath("upload");
+            String upload = request.getServletContext().getRealPath("upload");
             // 将文件上传到ftp服务中，返回targetFileName，上传文件的名称
             String targetFileName = iFileService.upload(file, upload);
             // 文件的完整地址，可以访问的地址
